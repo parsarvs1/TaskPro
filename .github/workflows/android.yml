@@ -41,7 +41,7 @@ jobs:
 
 
       # ==========================================
-      # 4. Show versions
+      # 4. Check versions
       # ==========================================
       - name: Check versions
         run: |
@@ -58,7 +58,7 @@ jobs:
 
 
       # ==========================================
-      # 5. Install npm packages
+      # 5. Install dependencies
       # ==========================================
       - name: Install dependencies
         run: |
@@ -73,7 +73,7 @@ jobs:
 
 
       # ==========================================
-      # 6. Prepare www
+      # 6. Prepare WWW
       # ==========================================
       - name: Prepare web files
         run: |
@@ -95,13 +95,12 @@ jobs:
       # ==========================================
       - name: Check icon
         run: |
-          echo "========== ICON =========="
-
           if [ ! -f "icon.png" ]; then
             echo "ERROR: icon.png not found!"
             exit 1
           fi
 
+          echo "========== ICON =========="
           file icon.png
           ls -lh icon.png
 
@@ -119,42 +118,140 @@ jobs:
           }
           EOF
 
-          echo "========== CAPACITOR CONFIG =========="
           cat capacitor.config.json
 
 
       # ==========================================
-      # 9. Prepare resources
+      # 9. Prepare Android
       # ==========================================
-      - name: Prepare app icon resources
+      - name: Prepare Android
         run: |
-          rm -rf resources
-          mkdir -p resources
+          rm -rf android
 
-          cp icon.png resources/icon.png
-
-          echo "========== RESOURCE ICON =========="
-          file resources/icon.png
-
-
-      # ==========================================
-      # 10. Add Android
-      # ==========================================
-      - name: Add Android platform
-        run: |
           npx cap add android
 
 
       # ==========================================
-      # 11. Generate Android icons
+      # 10. Install ImageMagick
+      # ==========================================
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+
+      # ==========================================
+      # 11. Generate Android icons manually
       # ==========================================
       - name: Generate Android icons
         run: |
-          npx capacitor-assets generate --android
+          set -e
+
+          echo "========== Preparing icons =========="
+
+          ICON="icon.png"
+
+          if [ ! -f "$ICON" ]; then
+            echo "ERROR: icon.png not found!"
+            exit 1
+          fi
+
+          # Remove old launcher resources
+          rm -rf android/app/src/main/res/mipmap-ldpi
+          rm -rf android/app/src/main/res/mipmap-mdpi
+          rm -rf android/app/src/main/res/mipmap-hdpi
+          rm -rf android/app/src/main/res/mipmap-xhdpi
+          rm -rf android/app/src/main/res/mipmap-xxhdpi
+          rm -rf android/app/src/main/res/mipmap-xxxhdpi
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+
+          # Create folders
+          mkdir -p android/app/src/main/res/mipmap-ldpi
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+          # Android launcher icon sizes
+          convert "$ICON" -resize 36x36 \
+            android/app/src/main/res/mipmap-ldpi/ic_launcher.png
+
+          convert "$ICON" -resize 48x48 \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+
+          convert "$ICON" -resize 72x72 \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+
+          convert "$ICON" -resize 96x96 \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+
+          convert "$ICON" -resize 144x144 \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+
+          convert "$ICON" -resize 192x192 \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          # Round launcher icons
+          cp android/app/src/main/res/mipmap-ldpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-ldpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+          echo ""
+          echo "========== Generated icons =========="
+
+          find android/app/src/main/res \
+            -type f \
+            \( -name "ic_launcher.png" -o -name "ic_launcher_round.png" \) \
+            | sort
 
 
       # ==========================================
-      # 12. Configure Gradle
+      # 12. Fix Android Manifest
+      # ==========================================
+      - name: Configure Android launcher
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path(
+              "android/app/src/main/AndroidManifest.xml"
+          )
+
+          text = manifest.read_text()
+
+          text = text.replace(
+              'android:icon="@mipmap/ic_launcher"',
+              'android:icon="@mipmap/ic_launcher"'
+          )
+
+          text = text.replace(
+              'android:roundIcon="@mipmap/ic_launcher_round"',
+              'android:roundIcon="@mipmap/ic_launcher_round"'
+          )
+
+          manifest.write_text(text)
+
+          print(manifest.read_text())
+          PY
+
+
+      # ==========================================
+      # 13. Gradle properties
       # ==========================================
       - name: Configure Gradle
         run: |
@@ -168,7 +265,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Fix Kotlin duplicate dependencies
+      # 14. Fix Kotlin duplicate classes
       # ==========================================
       - name: Fix Kotlin dependencies
         run: |
@@ -187,7 +284,7 @@ jobs:
 
 
       # ==========================================
-      # 14. Sync Capacitor
+      # 15. Sync Capacitor
       # ==========================================
       - name: Sync Capacitor
         run: |
@@ -195,9 +292,9 @@ jobs:
 
 
       # ==========================================
-      # 15. Check Android project
+      # 16. Verify project
       # ==========================================
-      - name: Check Android project
+      - name: Verify Android project
         run: |
           echo "========== ANDROID =========="
           ls -lah android
@@ -207,24 +304,16 @@ jobs:
           ls -lah android/gradle
 
           echo ""
-          echo "========== GRADLE WRAPPER =========="
-          ls -lah android/gradle/wrapper
+          echo "========== ICONS =========="
 
-          echo ""
-          echo "========== ICON FILES =========="
           find android/app/src/main/res \
             -type f \
-            \( \
-              -name "ic_launcher.png" \
-              -o -name "ic_launcher_round.png" \
-              -o -name "ic_launcher_foreground.png" \
-              -o -name "ic_launcher.xml" \
-            \) \
+            -name "ic_launcher*" \
             | sort
 
 
       # ==========================================
-      # 16. Make Gradle executable
+      # 17. Make Gradle executable
       # ==========================================
       - name: Make Gradle executable
         working-directory: android
@@ -233,7 +322,7 @@ jobs:
 
 
       # ==========================================
-      # 17. Build APK
+      # 18. Build APK
       # ==========================================
       - name: Build Debug APK
         working-directory: android
@@ -245,7 +334,7 @@ jobs:
 
 
       # ==========================================
-      # 18. Find APK
+      # 19. Find APK
       # ==========================================
       - name: Find APK
         run: |
@@ -258,7 +347,7 @@ jobs:
 
 
       # ==========================================
-      # 19. Upload APK
+      # 20. Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4

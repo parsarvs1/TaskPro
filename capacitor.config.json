@@ -1,0 +1,8 @@
+{
+  "appId": "com.parsarvs1.taskpro",
+  "appName": "TaskPro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

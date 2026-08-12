@@ -1,0 +1,86 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512">
+
+    <defs>
+
+        <linearGradient
+            id="bg"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1">
+
+            <stop
+                offset="0%"
+                stop-color="#5b5bf7"/>
+
+            <stop
+                offset="100%"
+                stop-color="#7c6cff"/>
+
+        </linearGradient>
+
+    </defs>
+
+
+    <rect
+        width="512"
+        height="512"
+        rx="110"
+        fill="url(#bg)"
+    />
+
+
+    <!-- Rocket -->
+
+    <path
+        d="
+        M256 82
+        C180 140 156 226 178 310
+        L222 354
+        C306 376 392 350 430 256
+        C389 254 352 238 322 208
+        C292 178 277 141 256 82
+        Z
+        "
+        fill="white"
+        opacity="0.97"
+    />
+
+
+    <!-- Window -->
+
+    <circle
+        cx="326"
+        cy="205"
+        r="28"
+        fill="#5b5bf7"
+    />
+
+
+    <!-- Flame -->
+
+    <path
+        d="
+        M190 330
+        C142 348 118 382 128 424
+        C154 405 178 397 204 394
+        C190 378 184 354 190 330
+        Z
+        "
+        fill="#ffd166"
+    />
+
+
+    <path
+        d="
+        M214 350
+        C184 374 180 401 198 425
+        C220 407 232 389 230 366
+        Z
+        "
+        fill="#ff9f43"
+    />
+
+</svg>

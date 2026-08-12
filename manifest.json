@@ -1,0 +1,22 @@
+{
+  "name": "TaskPro",
+  "short_name": "TaskPro",
+  "description": "A simple and smart task management app.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6ff",
+  "theme_color": "#5b5bf7",
+  "lang": "en",
+  "dir": "ltr",
+
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

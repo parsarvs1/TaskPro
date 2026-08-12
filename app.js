@@ -1,12 +1,46 @@
-// ============================
+// ========================================
 // TaskPro
-// ============================
+// Version 1.1.0
+// ========================================
 
 
-// ============================
-// Elements
-// ============================
+// ========================================
+// ELEMENTS
+// ========================================
 
+// Dark Mode
+const darkModeBtn =
+    document.getElementById("darkModeBtn");
+
+
+// Navigation
+const navButtons =
+    document.querySelectorAll(".nav-btn");
+
+
+// Pages
+const homePage =
+    document.getElementById("homePage");
+
+const tasksPage =
+    document.getElementById("tasksPage");
+
+const statsPage =
+    document.getElementById("statsPage");
+
+
+// Home
+const goToTasksBtn =
+    document.getElementById("goToTasksBtn");
+
+const homeProgress =
+    document.getElementById("homeProgress");
+
+const homeProgressBar =
+    document.getElementById("homeProgressBar");
+
+
+// Task input
 const taskInput =
     document.getElementById("taskInput");
 
@@ -16,51 +50,41 @@ const prioritySelect =
 const addBtn =
     document.getElementById("addBtn");
 
-const taskList =
-    document.getElementById("taskList");
 
-const totalTasks =
-    document.getElementById("totalTasks");
+// Search
+const searchInput =
+    document.getElementById("searchInput");
 
-const completedTasks =
-    document.getElementById("completedTasks");
+const clearSearch =
+    document.getElementById("clearSearch");
 
-const remainingTasks =
-    document.getElementById("remainingTasks");
 
-const progressBar =
-    document.getElementById("progressBar");
-
-const progressText =
-    document.getElementById("progressText");
-
-const darkModeBtn =
-    document.getElementById("darkModeBtn");
-
+// Filters
 const filterButtons =
     document.querySelectorAll(".filter-btn");
 
+
+// Sort
 const sortSelect =
     document.getElementById("sortSelect");
 
 
-// Home
-
-const homeTotal =
-    document.getElementById("homeTotal");
-
-const homeCompleted =
-    document.getElementById("homeCompleted");
-
-const homeRemaining =
-    document.getElementById("homeRemaining");
-
-const goToTasksBtn =
-    document.getElementById("goToTasksBtn");
+// Task list
+const taskList =
+    document.getElementById("taskList");
 
 
-// Stats
+// Task toolbar
+const taskCount =
+    document.getElementById("taskCount");
 
+const clearCompletedBtn =
+    document.getElementById(
+        "clearCompletedBtn"
+    );
+
+
+// Statistics
 const bigProgress =
     document.getElementById("bigProgress");
 
@@ -76,195 +100,61 @@ const statsCompleted =
 const statsRemaining =
     document.getElementById("statsRemaining");
 
-
-// Navigation
-
-const navButtons =
-    document.querySelectorAll(".nav-btn");
-
-const pages = {
-
-    home:
-        document.getElementById("homePage"),
-
-    tasks:
-        document.getElementById("tasksPage"),
-
-    stats:
-        document.getElementById("statsPage")
-
-};
+const statsMessage =
+    document.getElementById("statsMessage");
 
 
-// ============================
-// Tasks
-// ============================
+// Toast
+const toast =
+    document.getElementById("toast");
 
-let tasks =
-    JSON.parse(
-        localStorage.getItem("taskpro_tasks")
-    ) || [];
+const toastIcon =
+    document.getElementById("toastIcon");
+
+const toastMessage =
+    document.getElementById("toastMessage");
 
 
-// ============================
-// Filter / Sort
-// ============================
+// ========================================
+// DATA
+// ========================================
 
+let tasks = [];
+
+
+// Load tasks from localStorage
+
+try {
+
+    tasks =
+        JSON.parse(
+            localStorage.getItem(
+                "taskpro_tasks"
+            )
+        ) || [];
+
+} catch (error) {
+
+    tasks = [];
+
+}
+
+
+// Current filter
 let currentFilter = "all";
 
+
+// Search text
+let searchText = "";
+
+
+// Current sort
 let currentSort = "newest";
 
 
-// ============================
-// Dark Mode
-// ============================
-
-let darkMode =
-    localStorage.getItem(
-        "taskpro_darkMode"
-    ) === "true";
-
-
-function applyDarkMode() {
-
-    if (darkMode) {
-
-        document.body.classList.add("dark");
-
-        darkModeBtn.textContent = "☀️";
-
-    } else {
-
-        document.body.classList.remove("dark");
-
-        darkModeBtn.textContent = "🌙";
-
-    }
-
-}
-
-
-applyDarkMode();
-
-
-darkModeBtn.addEventListener(
-    "click",
-    function () {
-
-        darkMode = !darkMode;
-
-        localStorage.setItem(
-            "taskpro_darkMode",
-            darkMode
-        );
-
-        applyDarkMode();
-
-    }
-);
-
-
-// ============================
-// Navigation
-// ============================
-
-function showPage(pageName) {
-
-    Object.keys(pages).forEach(
-        function (page) {
-
-            pages[page].classList.remove(
-                "active-page"
-            );
-
-        }
-    );
-
-
-    if (pages[pageName]) {
-
-        pages[pageName].classList.add(
-            "active-page"
-        );
-
-    }
-
-
-    navButtons.forEach(
-        function (button) {
-
-            button.classList.remove(
-                "active"
-            );
-
-
-            if (
-                button.dataset.page === pageName
-            ) {
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-
-        }
-    );
-
-
-    // Update statistics when opening stats
-
-    if (pageName === "stats") {
-
-        updateStats();
-
-    }
-
-}
-
-
-// Navigation buttons
-
-navButtons.forEach(
-    function (button) {
-
-        button.addEventListener(
-            "click",
-            function () {
-
-                const page =
-                    button.dataset.page;
-
-                showPage(page);
-
-            }
-        );
-
-    }
-);
-
-
-// Home button
-
-if (goToTasksBtn) {
-
-    goToTasksBtn.addEventListener(
-        "click",
-        function () {
-
-            showPage("tasks");
-
-            taskInput.focus();
-
-        }
-    );
-
-}
-
-
-// ============================
-// Save Tasks
-// ============================
+// ========================================
+// SAVE TASKS
+// ========================================
 
 function saveTasks() {
 
@@ -276,9 +166,248 @@ function saveTasks() {
 }
 
 
-// ============================
-// Add Task
-// ============================
+// ========================================
+// TOAST
+// ========================================
+
+let toastTimer = null;
+
+
+function showToast(
+    message,
+    icon = "✅"
+) {
+
+    if (!toast) {
+        return;
+    }
+
+
+    toastIcon.textContent =
+        icon;
+
+
+    toastMessage.textContent =
+        message;
+
+
+    toast.classList.add("show");
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2200
+        );
+
+}
+
+
+// ========================================
+// DARK MODE
+// ========================================
+
+let darkMode =
+    localStorage.getItem(
+        "taskpro_darkMode"
+    ) === "true";
+
+
+function applyDarkMode() {
+
+    document.body.classList.toggle(
+        "dark",
+        darkMode
+    );
+
+
+    if (darkModeBtn) {
+
+        darkModeBtn.textContent =
+            darkMode
+                ? "☀️"
+                : "🌙";
+
+    }
+
+}
+
+
+applyDarkMode();
+
+
+if (darkModeBtn) {
+
+    darkModeBtn.addEventListener(
+        "click",
+        () => {
+
+            darkMode =
+                !darkMode;
+
+
+            localStorage.setItem(
+                "taskpro_darkMode",
+                darkMode
+            );
+
+
+            applyDarkMode();
+
+
+            showToast(
+
+                darkMode
+                    ? "حالت تاریک فعال شد"
+                    : "حالت روشن فعال شد",
+
+                darkMode
+                    ? "🌙"
+                    : "☀️"
+
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
+// NAVIGATION
+// ========================================
+
+function showPage(pageName) {
+
+    // Hide pages
+
+    homePage.classList.remove(
+        "active-page"
+    );
+
+    tasksPage.classList.remove(
+        "active-page"
+    );
+
+    statsPage.classList.remove(
+        "active-page"
+    );
+
+
+    // Show selected page
+
+    if (pageName === "home") {
+
+        homePage.classList.add(
+            "active-page"
+        );
+
+    }
+
+
+    if (pageName === "tasks") {
+
+        tasksPage.classList.add(
+            "active-page"
+        );
+
+    }
+
+
+    if (pageName === "stats") {
+
+        statsPage.classList.add(
+            "active-page"
+        );
+
+    }
+
+
+    // Update navigation
+
+    navButtons.forEach(
+        button => {
+
+            button.classList.toggle(
+
+                "active",
+
+                button.dataset.page ===
+                pageName
+
+            );
+
+        }
+    );
+
+
+    updateStats();
+
+}
+
+
+// Navigation events
+
+navButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                showPage(
+                    button.dataset.page
+                );
+
+            }
+        );
+
+    }
+);
+
+
+// ========================================
+// GO TO TASKS
+// ========================================
+
+if (goToTasksBtn) {
+
+    goToTasksBtn.addEventListener(
+        "click",
+        () => {
+
+            showPage("tasks");
+
+
+            setTimeout(
+                () => {
+
+                    taskInput.focus();
+
+                },
+                100
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
+// ADD TASK
+// ========================================
 
 function addTask() {
 
@@ -286,22 +415,25 @@ function addTask() {
         taskInput.value.trim();
 
 
-    const priority =
-        prioritySelect.value;
+    // Empty input
 
+    if (!text) {
 
-    if (text === "") {
-
-        alert(
-            "لطفاً یک کار وارد کن!"
+        showToast(
+            "اول نام کار را بنویس!",
+            "⚠️"
         );
 
+
         taskInput.focus();
+
 
         return;
 
     }
 
+
+    // Create new task
 
     const newTask = {
 
@@ -309,208 +441,225 @@ function addTask() {
 
         text: text,
 
-        priority: priority,
+        priority:
+            prioritySelect.value,
 
         completed: false,
 
-        createdAt: new Date().toISOString()
+        createdAt: Date.now()
 
     };
 
 
-    tasks.push(newTask);
+    // Add task
 
+    tasks.push(
+        newTask
+    );
+
+
+    // Save
 
     saveTasks();
 
 
+    // Clear input
+
     taskInput.value = "";
 
-    prioritySelect.value = "medium";
 
+    // Reset priority
+
+    prioritySelect.value =
+        "medium";
+
+
+    // Update
 
     renderTasks();
 
     updateStats();
 
+
+    // Message
+
+    showToast(
+        "کار جدید اضافه شد 🎉",
+        "✅"
+    );
+
+
+    taskInput.focus();
+
 }
 
 
-// ============================
-// Delete Task
-// ============================
+// Add button
+
+addBtn.addEventListener(
+    "click",
+    addTask
+);
+
+
+// Enter key
+
+taskInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            addTask();
+
+        }
+
+    }
+);
+
+
+// ========================================
+// DELETE TASK
+// ========================================
 
 function deleteTask(id) {
 
     tasks =
         tasks.filter(
-            function (task) {
-
-                return task.id !== id;
-
-            }
+            task =>
+                task.id !== id
         );
 
 
     saveTasks();
 
+
     renderTasks();
 
     updateStats();
 
+
+    showToast(
+        "کار حذف شد",
+        "🗑️"
+    );
+
 }
 
 
-// ============================
-// Toggle Task
-// ============================
+// ========================================
+// TOGGLE TASK
+// ========================================
 
 function toggleTask(id) {
 
-    tasks.forEach(
-        function (task) {
+    const task =
+        tasks.find(
+            task =>
+                task.id === id
+        );
 
-            if (task.id === id) {
 
-                task.completed =
-                    !task.completed;
+    if (!task) {
+        return;
+    }
 
-            }
 
-        }
-    );
+    task.completed =
+        !task.completed;
 
 
     saveTasks();
 
+
     renderTasks();
 
     updateStats();
 
-}
 
+    if (task.completed) {
 
-// ============================
-// Priority
-// ============================
+        showToast(
+            "آفرین! کار انجام شد 🎉",
+            "✅"
+        );
 
-function getPriorityInfo(priority) {
+    } else {
 
-    if (priority === "high") {
-
-        return {
-
-            text: "🔴 زیاد",
-
-            className: "priority-high"
-
-        };
+        showToast(
+            "کار دوباره فعال شد",
+            "↩️"
+        );
 
     }
-
-
-    if (priority === "medium") {
-
-        return {
-
-            text: "🟡 متوسط",
-
-            className: "priority-medium"
-
-        };
-
-    }
-
-
-    return {
-
-        text: "🟢 کم",
-
-        className: "priority-low"
-
-    };
 
 }
 
 
-// ============================
-// Edit Task
-// ============================
+// ========================================
+// EDIT TASK
+// ========================================
 
 function editTask(id) {
 
-    const taskElement =
+    const task =
+        tasks.find(
+            task =>
+                task.id === id
+        );
+
+
+    if (!task) {
+        return;
+    }
+
+
+    const element =
         document.querySelector(
             `[data-id="${id}"]`
         );
 
 
-    const task =
-        tasks.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!task || !taskElement) {
-
+    if (!element) {
         return;
-
     }
 
 
-    taskElement.innerHTML = `
+    element.innerHTML = `
 
         <div class="edit-area">
 
             <input
                 class="edit-input"
-                value="${task.text}"
+                value="${escapeHTML(
+                    task.text
+                )}"
+                type="text"
             >
+
 
             <select class="edit-select">
 
-                <option
-                    value="low"
-                    ${task.priority === "low"
-                        ? "selected"
-                        : ""}>
-
+                <option value="low">
                     🟢 کم
-
                 </option>
 
-                <option
-                    value="medium"
-                    ${task.priority === "medium"
-                        ? "selected"
-                        : ""}>
-
+                <option value="medium">
                     🟡 متوسط
-
                 </option>
 
-                <option
-                    value="high"
-                    ${task.priority === "high"
-                        ? "selected"
-                        : ""}>
-
+                <option value="high">
                     🔴 زیاد
-
                 </option>
 
             </select>
 
+
             <button
                 class="save-edit"
-                type="button">
-
+                type="button"
+            >
                 ذخیره
-
             </button>
 
         </div>
@@ -519,75 +668,87 @@ function editTask(id) {
 
 
     const input =
-        taskElement.querySelector(
+        element.querySelector(
             ".edit-input"
         );
 
 
     const select =
-        taskElement.querySelector(
+        element.querySelector(
             ".edit-select"
         );
 
 
     const saveButton =
-        taskElement.querySelector(
+        element.querySelector(
             ".save-edit"
         );
+
+
+    select.value =
+        task.priority;
 
 
     input.focus();
 
 
-    function saveEdit() {
-
-        const newText =
-            input.value.trim();
-
-
-        if (newText === "") {
-
-            alert(
-                "نام کار نمی‌تواند خالی باشد!"
-            );
-
-            input.focus();
-
-            return;
-
-        }
-
-
-        task.text =
-            newText;
-
-
-        task.priority =
-            select.value;
-
-
-        saveTasks();
-
-        renderTasks();
-
-        updateStats();
-
-    }
-
+    // Save
 
     saveButton.addEventListener(
         "click",
-        saveEdit
+        () => {
+
+            const newText =
+                input.value.trim();
+
+
+            if (!newText) {
+
+                showToast(
+                    "نام کار نمی‌تواند خالی باشد!",
+                    "⚠️"
+                );
+
+
+                return;
+
+            }
+
+
+            task.text =
+                newText;
+
+
+            task.priority =
+                select.value;
+
+
+            saveTasks();
+
+
+            renderTasks();
+
+            updateStats();
+
+
+            showToast(
+                "کار ویرایش شد",
+                "✏️"
+            );
+
+        }
     );
 
+
+    // Enter to save
 
     input.addEventListener(
         "keydown",
-        function (event) {
+        event => {
 
             if (event.key === "Enter") {
 
-                saveEdit();
+                saveButton.click();
 
             }
 
@@ -597,461 +758,103 @@ function editTask(id) {
 }
 
 
-// ============================
-// Render Tasks
-// ============================
+// ========================================
+// PRIORITY
+// ========================================
 
-function renderTasks() {
+function priorityInfo(priority) {
 
-    taskList.innerHTML = "";
+    if (priority === "high") {
 
+        return {
 
-    let filteredTasks =
-        tasks.filter(
-            function (task) {
+            text: "🔴 زیاد",
 
-                if (currentFilter === "all") {
+            className:
+                "priority-high"
 
-                    return true;
-
-                }
-
-
-                if (currentFilter === "active") {
-
-                    return !task.completed;
-
-                }
-
-
-                if (
-                    currentFilter === "completed"
-                ) {
-
-                    return task.completed;
-
-                }
-
-
-                if (currentFilter === "high") {
-
-                    return task.priority === "high";
-
-                }
-
-
-                return true;
-
-            }
-        );
-
-
-    // =========================
-    // Sort
-    // =========================
-
-    filteredTasks.sort(
-        function (a, b) {
-
-            if (currentSort === "newest") {
-
-                return b.id - a.id;
-
-            }
-
-
-            if (currentSort === "oldest") {
-
-                return a.id - b.id;
-
-            }
-
-
-            if (currentSort === "priority") {
-
-                const priorityValue = {
-
-                    high: 3,
-
-                    medium: 2,
-
-                    low: 1
-
-                };
-
-
-                return (
-                    priorityValue[b.priority] -
-                    priorityValue[a.priority]
-                );
-
-            }
-
-
-            return 0;
-
-        }
-    );
-
-
-    // =========================
-    // Empty
-    // =========================
-
-    if (filteredTasks.length === 0) {
-
-        taskList.innerHTML = `
-
-            <div class="task">
-
-                <span class="task-text">
-
-                    هنوز کاری اینجا نیست 🎉
-
-                </span>
-
-            </div>
-
-        `;
-
-        return;
+        };
 
     }
 
 
-    // =========================
-    // Create Tasks
-    // =========================
+    if (priority === "low") {
 
-    filteredTasks.forEach(
-        function (task) {
+        return {
 
-            if (!task.priority) {
+            text: "🟢 کم",
 
-                task.priority =
-                    "medium";
+            className:
+                "priority-low"
 
-            }
+        };
 
-
-            const priorityInfo =
-                getPriorityInfo(
-                    task.priority
-                );
+    }
 
 
-            const taskElement =
-                document.createElement(
-                    "div"
-                );
+    return {
 
+        text: "🟡 متوسط",
 
-            taskElement.className =
-                "task";
+        className:
+            "priority-medium"
 
-
-            taskElement.dataset.id =
-                task.id;
-
-
-            if (task.completed) {
-
-                taskElement.classList.add(
-                    "completed"
-                );
-
-            }
-
-
-            taskElement.innerHTML = `
-
-                <input
-                    type="checkbox"
-                    ${task.completed
-                        ? "checked"
-                        : ""}
-                >
-
-                <span class="task-text">
-
-                    ${escapeHTML(
-                        task.text
-                    )}
-
-                </span>
-
-                <span
-                    class="priority
-                    ${priorityInfo.className}">
-
-                    ${priorityInfo.text}
-
-                </span>
-
-                <div class="task-actions">
-
-                    <button
-                        class="edit-btn"
-                        type="button">
-
-                        ✏️
-
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        type="button">
-
-                        🗑️
-
-                    </button>
-
-                </div>
-
-            `;
-
-
-            // Checkbox
-
-            taskElement
-                .querySelector("input")
-                .addEventListener(
-                    "change",
-                    function () {
-
-                        toggleTask(task.id);
-
-                    }
-                );
-
-
-            // Edit
-
-            taskElement
-                .querySelector(".edit-btn")
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        editTask(task.id);
-
-                    }
-                );
-
-
-            // Delete
-
-            taskElement
-                .querySelector(".delete-btn")
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        deleteTask(task.id);
-
-                    }
-                );
-
-
-            taskList.appendChild(
-                taskElement
-            );
-
-        }
-    );
-
-
-    saveTasks();
+    };
 
 }
 
 
-// ============================
-// Escape HTML
-// ============================
+// ========================================
+// SEARCH
+// ========================================
 
-function escapeHTML(text) {
+searchInput.addEventListener(
+    "input",
+    () => {
 
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        text;
-
-    return div.innerHTML;
-
-}
+        searchText =
+            searchInput.value.trim();
 
 
-// ============================
-// Statistics
-// ============================
-
-function updateStats() {
-
-    const total =
-        tasks.length;
-
-
-    const completed =
-        tasks.filter(
-            function (task) {
-
-                return task.completed;
-
-            }
-        ).length;
-
-
-    const remaining =
-        total - completed;
-
-
-    let percentage = 0;
-
-
-    if (total > 0) {
-
-        percentage =
-            Math.round(
-                (completed / total) * 100
-            );
+        renderTasks();
 
     }
+);
 
 
-    // =========================
-    // Tasks Page
-    // =========================
+clearSearch.addEventListener(
+    "click",
+    () => {
 
-    if (totalTasks) {
+        searchInput.value = "";
 
-        totalTasks.textContent =
-            total;
-
-    }
+        searchText = "";
 
 
-    if (completedTasks) {
+        renderTasks();
 
-        completedTasks.textContent =
-            completed;
+
+        searchInput.focus();
 
     }
+);
 
 
-    if (remainingTasks) {
-
-        remainingTasks.textContent =
-            remaining;
-
-    }
-
-
-    if (progressBar) {
-
-        progressBar.style.width =
-            percentage + "%";
-
-    }
-
-
-    if (progressText) {
-
-        progressText.textContent =
-            percentage +
-            "٪ انجام شده";
-
-    }
-
-
-    // =========================
-    // Home
-    // =========================
-
-    if (homeTotal) {
-
-        homeTotal.textContent =
-            total;
-
-    }
-
-
-    if (homeCompleted) {
-
-        homeCompleted.textContent =
-            completed;
-
-    }
-
-
-    if (homeRemaining) {
-
-        homeRemaining.textContent =
-            remaining;
-
-    }
-
-
-    // =========================
-    // Stats Page
-    // =========================
-
-    if (statsTotal) {
-
-        statsTotal.textContent =
-            total;
-
-    }
-
-
-    if (statsCompleted) {
-
-        statsCompleted.textContent =
-            completed;
-
-    }
-
-
-    if (statsRemaining) {
-
-        statsRemaining.textContent =
-            remaining;
-
-    }
-
-
-    if (bigProgress) {
-
-        bigProgress.textContent =
-            percentage + "٪";
-
-    }
-
-
-    if (bigProgressBar) {
-
-        bigProgressBar.style.width =
-            percentage + "%";
-
-    }
-
-}
-
-
-// ============================
-// Filters
-// ============================
+// ========================================
+// FILTER
+// ========================================
 
 filterButtons.forEach(
-    function (button) {
+    button => {
 
         button.addEventListener(
             "click",
-            function () {
+            () => {
+
+                // Remove active
 
                 filterButtons.forEach(
-                    function (btn) {
+                    btn => {
 
                         btn.classList.remove(
                             "active"
@@ -1061,10 +864,14 @@ filterButtons.forEach(
                 );
 
 
+                // Add active
+
                 button.classList.add(
                     "active"
                 );
 
+
+                // Set filter
 
                 currentFilter =
                     button.dataset.filter;
@@ -1079,67 +886,624 @@ filterButtons.forEach(
 );
 
 
-// ============================
-// Sort
-// ============================
+// ========================================
+// SORT
+// ========================================
 
-if (sortSelect) {
+sortSelect.addEventListener(
+    "change",
+    () => {
 
-    sortSelect.addEventListener(
-        "change",
-        function () {
-
-            currentSort =
-                sortSelect.value;
+        currentSort =
+            sortSelect.value;
 
 
-            renderTasks();
+        renderTasks();
 
-        }
+    }
+);
+
+
+// ========================================
+// CLEAR COMPLETED TASKS
+// ========================================
+
+function clearCompletedTasks() {
+
+    const completedCount =
+        tasks.filter(
+            task =>
+                task.completed
+        ).length;
+
+
+    // Nothing to delete
+
+    if (completedCount === 0) {
+
+        showToast(
+            "کاری برای پاک کردن وجود ندارد",
+            "ℹ️"
+        );
+
+
+        return;
+
+    }
+
+
+    // Remove completed
+
+    tasks =
+        tasks.filter(
+            task =>
+                !task.completed
+        );
+
+
+    // Save
+
+    saveTasks();
+
+
+    // Update
+
+    renderTasks();
+
+    updateStats();
+
+
+    // Message
+
+    showToast(
+        `${completedCount} کار انجام‌شده پاک شد`,
+        "🧹"
     );
 
 }
 
 
-// ============================
-// Add Button
-// ============================
+// Clear completed button
 
-if (addBtn) {
+if (clearCompletedBtn) {
 
-    addBtn.addEventListener(
+    clearCompletedBtn.addEventListener(
         "click",
-        addTask
+        clearCompletedTasks
     );
 
 }
 
 
-// ============================
-// Enter
-// ============================
+// ========================================
+// RENDER TASKS
+// ========================================
 
-if (taskInput) {
+function renderTasks() {
 
-    taskInput.addEventListener(
-        "keydown",
-        function (event) {
+    taskList.innerHTML = "";
 
-            if (event.key === "Enter") {
 
-                addTask();
+    // Copy tasks
+
+    let result =
+        [...tasks];
+
+
+    // ====================================
+    // SEARCH
+    // ====================================
+
+    if (searchText) {
+
+        result =
+            result.filter(
+                task => {
+
+                    return task.text
+                        .toLowerCase()
+                        .includes(
+                            searchText
+                                .toLowerCase()
+                        );
+
+                }
+            );
+
+    }
+
+
+    // ====================================
+    // FILTER
+    // ====================================
+
+    if (
+        currentFilter ===
+        "active"
+    ) {
+
+        result =
+            result.filter(
+                task =>
+                    !task.completed
+            );
+
+    }
+
+
+    if (
+        currentFilter ===
+        "completed"
+    ) {
+
+        result =
+            result.filter(
+                task =>
+                    task.completed
+            );
+
+    }
+
+
+    if (
+        currentFilter ===
+        "high"
+    ) {
+
+        result =
+            result.filter(
+                task =>
+                    task.priority ===
+                    "high"
+            );
+
+    }
+
+
+    // ====================================
+    // SORT
+    // ====================================
+
+    if (
+        currentSort ===
+        "newest"
+    ) {
+
+        result.sort(
+            (a, b) =>
+                b.id - a.id
+        );
+
+    }
+
+
+    if (
+        currentSort ===
+        "oldest"
+    ) {
+
+        result.sort(
+            (a, b) =>
+                a.id - b.id
+        );
+
+    }
+
+
+    if (
+        currentSort ===
+        "priority"
+    ) {
+
+        const priorityValue = {
+
+            low: 1,
+
+            medium: 2,
+
+            high: 3
+
+        };
+
+
+        result.sort(
+            (a, b) => {
+
+                return (
+
+                    priorityValue[
+                        b.priority
+                    ]
+
+                    -
+
+                    priorityValue[
+                        a.priority
+                    ]
+
+                );
+
+            }
+        );
+
+    }
+
+
+    // ====================================
+    // EMPTY
+    // ====================================
+
+    if (result.length === 0) {
+
+        taskList.innerHTML = `
+
+            <div class="task empty-task">
+
+                <div>
+
+                    <strong>
+
+                        ${
+                            searchText
+                                ? "چیزی پیدا نشد 🔎"
+                                : "هنوز کاری نداری 🎉"
+                        }
+
+                    </strong>
+
+
+                    <small>
+
+                        ${
+                            searchText
+                                ? "جستجوی دیگری امتحان کن."
+                                : "اولین کارتت را اضافه کن!"
+                        }
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    // ====================================
+    // CREATE TASKS
+    // ====================================
+
+    result.forEach(
+        task => {
+
+            const info =
+                priorityInfo(
+                    task.priority
+                );
+
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "task";
+
+
+            element.dataset.id =
+                task.id;
+
+
+            // Completed class
+
+            if (task.completed) {
+
+                element.classList.add(
+                    "completed"
+                );
 
             }
 
+
+            // HTML
+
+            element.innerHTML = `
+
+                <input
+                    type="checkbox"
+                    class="task-checkbox"
+                    ${
+                        task.completed
+                            ? "checked"
+                            : ""
+                    }
+                >
+
+
+                <span class="task-text">
+
+                    ${escapeHTML(
+                        task.text
+                    )}
+
+                </span>
+
+
+                <span
+                    class="priority
+                    ${info.className}"
+                >
+
+                    ${info.text}
+
+                </span>
+
+
+                <div class="task-actions">
+
+                    <button
+                        class="edit-btn"
+                        type="button"
+                        title="ویرایش"
+                    >
+                        ✏️
+                    </button>
+
+
+                    <button
+                        class="delete-btn"
+                        type="button"
+                        title="حذف"
+                    >
+                        🗑️
+                    </button>
+
+                </div>
+
+            `;
+
+
+            // Checkbox
+
+            const checkbox =
+                element.querySelector(
+                    ".task-checkbox"
+                );
+
+
+            checkbox.addEventListener(
+                "change",
+                () => {
+
+                    toggleTask(
+                        task.id
+                    );
+
+                }
+            );
+
+
+            // Edit
+
+            const editButton =
+                element.querySelector(
+                    ".edit-btn"
+                );
+
+
+            editButton.addEventListener(
+                "click",
+                () => {
+
+                    editTask(
+                        task.id
+                    );
+
+                }
+            );
+
+
+            // Delete
+
+            const deleteButton =
+                element.querySelector(
+                    ".delete-btn"
+                );
+
+
+            deleteButton.addEventListener(
+                "click",
+                () => {
+
+                    deleteTask(
+                        task.id
+                    );
+
+                }
+            );
+
+
+            // Add to list
+
+            taskList.appendChild(
+                element
+            );
+
         }
     );
 
 }
 
 
-// ============================
-// Start
-// ============================
+// ========================================
+// ESCAPE HTML
+// ========================================
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        text;
+
+
+    return div.innerHTML;
+
+}
+
+// ========================================
+// UPDATE STATISTICS
+// ========================================
+
+function updateStats() {
+
+    // Total
+
+    const total =
+        tasks.length;
+
+
+    // Completed
+
+    const completed =
+        tasks.filter(
+            task =>
+                task.completed
+        ).length;
+
+
+    // Remaining
+
+    const remaining =
+        total - completed;
+
+
+    // Percentage
+
+    const percent =
+        total === 0
+            ? 0
+            : Math.round(
+                (completed / total) * 100
+            );
+
+
+    // ====================================
+    // TASK COUNTER
+    // ====================================
+
+    if (taskCount) {
+
+        taskCount.textContent =
+            total;
+
+    }
+
+
+    // ====================================
+    // CLEAR COMPLETED BUTTON
+    // ====================================
+
+    if (clearCompletedBtn) {
+
+        clearCompletedBtn.disabled =
+            completed === 0;
+
+    }
+
+
+    // ====================================
+    // HOME
+    // ====================================
+
+    homeProgress.textContent =
+        percent + "٪";
+
+
+    homeProgressBar.style.width =
+        percent + "%";
+
+
+    // ====================================
+    // STATS
+    // ====================================
+
+    statsTotal.textContent =
+        total;
+
+
+    statsCompleted.textContent =
+        completed;
+
+
+    statsRemaining.textContent =
+        remaining;
+
+
+    bigProgress.textContent =
+        percent + "٪";
+
+
+    bigProgressBar.style.width =
+        percent + "%";
+
+
+    // ====================================
+    // STATS MESSAGE
+    // ====================================
+
+    if (total === 0) {
+
+        statsMessage.textContent =
+            "هنوز کاری ثبت نکردی. اولین کارت رو اضافه کن! 🚀";
+
+    }
+
+    else if (percent === 100) {
+
+        statsMessage.textContent =
+            "🎉 فوق‌العاده! همه کارها انجام شدند!";
+
+    }
+
+    else if (percent >= 70) {
+
+        statsMessage.textContent =
+            "🔥 عالی پیش رفتی! فقط کمی دیگه مونده.";
+
+    }
+
+    else if (percent >= 30) {
+
+        statsMessage.textContent =
+            "💪 خوبه! ادامه بده.";
+
+    }
+
+    else {
+
+        statsMessage.textContent =
+            "🚀 شروع کن! هر کار یک قدم جلوتره.";
+
+    }
+
+}
+
+
+// ========================================
+// START APP
+// ========================================
 
 renderTasks();
 

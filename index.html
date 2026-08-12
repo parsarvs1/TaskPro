@@ -2,509 +2,491 @@
 <html lang="fa" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
-    content="width=device-width, initial-scale=1.0">
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#5b5bf7">
 
     <title>TaskPro</title>
 
     <link rel="stylesheet" href="./style.css">
-
 </head>
 
 <body>
 
-    <div class="app">
+<div class="app">
 
+    <!-- HEADER -->
+    <header class="header">
 
-        <!-- =========================
-                     Header
-                ========================== -->
+        <div class="brand">
 
-        <header class="header">
-
-            <div class="brand">
-
-                <div class="logo">
-                    🚀
-                </div>
-
-                <div>
-
-                    <h1>
-                        TaskPro
-                    </h1>
-
-                    <p>
-                        مدیریت هوشمند کارهای روزانه
-                    </p>
-
-                </div>
-
+            <div class="logo">
+                🚀
             </div>
 
+            <div>
+                <h1>TaskPro</h1>
 
-            <button
-                id="darkModeBtn"
-                class="dark-mode-btn">
+                <p>
+                    مدیریت هوشمند کارهای روزانه
+                </p>
+            </div>
 
-                🌙
+        </div>
 
-            </button>
+        <button
+            id="darkModeBtn"
+            class="dark-mode-btn"
+            type="button">
 
-        </header>
+            🌙
+
+        </button>
+
+    </header>
 
 
-        <!-- =========================
-                     Navigation
-                ========================== -->
+    <!-- NAVIGATION -->
+    <nav class="navigation">
 
-        <nav class="navigation">
+        <button
+            class="nav-btn active"
+            data-page="home"
+            type="button">
 
-            <button
-                class="nav-btn active"
-                data-page="home">
+            <span>🏠</span>
+            خانه
 
-                🏠
-                <span>
-                    خانه
+        </button>
+
+        <button
+            class="nav-btn"
+            data-page="tasks"
+            type="button">
+
+            <span>📋</span>
+            کارها
+
+        </button>
+
+        <button
+            class="nav-btn"
+            data-page="stats"
+            type="button">
+
+            <span>📊</span>
+            آمار
+
+        </button>
+
+    </nav>
+
+
+    <!-- =========================
+         HOME PAGE
+    ========================== -->
+
+    <main
+        id="homePage"
+        class="page active-page">
+
+        <section class="welcome-card">
+
+            <div class="welcome-content">
+
+                <span class="welcome-badge">
+                    ✨ امروز شروع کن
                 </span>
-
-            </button>
-
-
-            <button
-                class="nav-btn"
-                data-page="tasks">
-
-                📋
-                <span>
-                    کارها
-                </span>
-
-            </button>
-
-
-            <button
-                class="nav-btn"
-                data-page="stats">
-
-                📊
-                <span>
-                    آمار
-                </span>
-
-            </button>
-
-        </nav>
-
-
-        <!-- =========================
-                     HOME
-                ========================== -->
-
-        <main
-            id="homePage"
-            class="page active-page">
-
-
-            <section class="welcome-card">
 
                 <h2>
                     سلام 👋
                 </h2>
 
                 <p>
-                    امروز قراره چه کارهایی انجام بدی؟
+                    کارهات رو مرتب کن و قدم‌به‌قدم پیش برو.
                 </p>
 
                 <button
                     id="goToTasksBtn"
-                    class="primary-btn">
+                    class="primary-btn"
+                    type="button">
 
                     ➕
                     افزودن کار جدید
 
                 </button>
 
-            </section>
+            </div>
+
+            <div class="welcome-icon">
+                🚀
+            </div>
+
+        </section>
 
 
-            <section class="quick-stats">
+        <!-- HOME PROGRESS -->
 
-                <div class="quick-card">
+        <section class="home-progress">
 
-                    <span>
-                        📋
-                    </span>
-
-                    <strong id="homeTotal">
-                        0
-                    </strong>
-
-                    <small>
-                        کل کارها
-                    </small>
-
-                </div>
-
-
-                <div class="quick-card">
-
-                    <span>
-                        ✅
-                    </span>
-
-                    <strong id="homeCompleted">
-                        0
-                    </strong>
-
-                    <small>
-                        انجام شده
-                    </small>
-
-                </div>
-
-
-                <div class="quick-card">
-
-                    <span>
-                        🔥
-                    </span>
-
-                    <strong id="homeRemaining">
-                        0
-                    </strong>
-
-                    <small>
-                        باقی مانده
-                    </small>
-
-                </div>
-
-            </section>
-
-
-        </main>
-
-
-        <!-- =========================
-                     TASKS
-                ========================== -->
-
-        <main
-            id="tasksPage"
-            class="page">
-
-
-            <section class="section-title">
+            <div class="section-heading">
 
                 <div>
 
-                    <h2>
-                        کارهای من 📋
-                    </h2>
-
-                    <p>
-                        کارهایت را مدیریت کن
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- Add Task -->
-
-            <div class="input-box">
-
-                <input
-                type="text"
-                id="taskInput"
-                placeholder="یک کار جدید بنویس..."
-                >
-
-
-                <select id="prioritySelect">
-
-                    <option value="low">
-                        🟢 کم
-                    </option>
-
-                    <option
-                        value="medium"
-                        selected>
-
-                        🟡 متوسط
-
-                    </option>
-
-                    <option value="high">
-                        🔴 زیاد
-                    </option>
-
-                </select>
-
-
-                <button id="addBtn">
-                    +
-                </button>
-
-            </div>
-
-
-            <!-- Statistics -->
-
-            <div class="stats">
-
-                <div class="stat">
-
-                    <span id="totalTasks">
-                        0
-                    </span>
+                    <h3>
+                        پیشرفت امروز
+                    </h3>
 
                     <small>
-                        کل کارها
+                        ادامه بده! 💪
                     </small>
 
                 </div>
 
-
-                <div class="stat">
-
-                    <span id="completedTasks">
-                        0
-                    </span>
-
-                    <small>
-                        انجام شده
-                    </small>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <span id="remainingTasks">
-                        0
-                    </span>
-
-                    <small>
-                        باقی مانده
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <!-- Progress -->
-
-            <div class="progress-box">
-
-                <div class="progress">
-
-                    <div id="progressBar"></div>
-
-                </div>
-
-                <p id="progressText">
-                    0٪ انجام شده
-                </p>
-
-            </div>
-
-
-            <!-- Filters -->
-
-            <div class="filters">
-
-                <button
-                    class="filter-btn active"
-                    data-filter="all">
-
-                    همه
-
-                </button>
-
-
-                <button
-                    class="filter-btn"
-                    data-filter="active">
-
-                    انجام‌نشده
-
-                </button>
-
-
-                <button
-                    class="filter-btn"
-                    data-filter="completed">
-
-                    انجام‌شده
-
-                </button>
-
-
-                <button
-                    class="filter-btn"
-                    data-filter="high">
-
-                    🔴 مهم
-
-                </button>
-
-            </div>
-
-
-            <!-- Sort -->
-
-            <div class="sort-box">
-
-                <label>
-                    مرتب‌سازی:
-                </label>
-
-
-                <select id="sortSelect">
-
-                    <option value="newest">
-                        جدیدترین
-                    </option>
-
-                    <option value="oldest">
-                        قدیمی‌ترین
-                    </option>
-
-                    <option value="priority">
-                        بر اساس اولویت
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- Task List -->
-
-            <div
-                id="taskList"
-                class="task-list">
-
-            </div>
-
-
-        </main>
-
-
-        <!-- =========================
-                     STATS
-                ========================== -->
-
-        <main
-            id="statsPage"
-            class="page">
-
-
-            <section class="section-title">
-
-                <h2>
-                    آمار عملکرد 📊
-                </h2>
-
-                <p>
-                    وضعیت کارهایت را بررسی کن
-                </p>
-
-            </section>
-
-
-            <div class="big-stat">
-
-                <span>
-                    درصد پیشرفت
-                </span>
-
-                <strong id="bigProgress">
+                <strong id="homeProgress">
                     0٪
                 </strong>
 
+            </div>
 
-                <div class="big-progress">
+            <div class="progress">
 
-                    <div id="bigProgressBar">
-                    </div>
-
-                </div>
+                <div id="homeProgressBar"></div>
 
             </div>
 
+        </section>
 
-            <div class="stats-grid">
-
-                <div class="info-card">
-
-                    <span>
-                        📋
-                    </span>
-
-                    <strong id="statsTotal">
-                        0
-                    </strong>
-
-                    <small>
-                        کل کارها
-                    </small>
-
-                </div>
+    </main>
 
 
-                <div class="info-card">
+    <!-- =========================
+         TASKS PAGE
+    ========================== -->
 
-                    <span>
-                        ✅
-                    </span>
+    <main
+        id="tasksPage"
+        class="page">
 
-                    <strong id="statsCompleted">
-                        0
-                    </strong>
+        <section class="section-title">
 
-                    <small>
-                        انجام شده
-                    </small>
+            <h2>
+                کارهای من 📋
+            </h2>
 
-                </div>
+            <p>
+                کارهایت را مدیریت کن
+            </p>
 
-
-                <div class="info-card">
-
-                    <span>
-                        ⏳
-                    </span>
-
-                    <strong id="statsRemaining">
-                        0
-                    </strong>
-
-                    <small>
-                        باقی مانده
-                    </small>
-
-                </div>
-
-            </div>
+        </section>
 
 
-        </main>
+        <!-- ADD TASK -->
+
+        <div class="input-box">
+
+            <input
+                type="text"
+                id="taskInput"
+                placeholder="مثلاً: مطالعه ریاضی..."
+                autocomplete="off">
 
 
+            <select id="prioritySelect">
+
+                <option value="low">
+                    🟢 کم
+                </option>
+
+                <option
+                    value="medium"
+                    selected>
+
+                    🟡 متوسط
+
+                </option>
+
+                <option value="high">
+                    🔴 زیاد
+                </option>
+
+            </select>
+
+
+            <button
+                id="addBtn"
+                type="button">
+
+                +
+
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <span>
+                🔎
+            </span>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="جستجوی کارها..."
+                autocomplete="off">
+
+            <button
+                id="clearSearch"
+                type="button">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <!-- FILTERS -->
+
+        <div class="filters">
+
+            <button
+                class="filter-btn active"
+                data-filter="all"
+                type="button">
+
+                همه
+
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="active"
+                type="button">
+
+                ⏳ فعال
+
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="completed"
+                type="button">
+
+                ✅ انجام شده
+
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="high"
+                type="button">
+
+                🔴 مهم
+
+            </button>
+
+        </div>
+
+
+        <!-- SORT -->
+
+        <div class="sort-box">
+
+            <label>
+                مرتب‌سازی
+            </label>
+
+            <select id="sortSelect">
+
+                <option value="newest">
+                    جدیدترین
+                </option>
+
+                <option value="oldest">
+                    قدیمی‌ترین
+                </option>
+
+                <option value="priority">
+                    اولویت
+                </option>
+
+            </select>
+
+        </div>
+
+<div class="task-toolbar">
+
+    <div class="task-counter">
+        <span>📋</span>
+        <strong id="taskCount">0</strong>
+        <small>کار</small>
     </div>
 
+    <button
+        id="clearCompletedBtn"
+        class="clear-completed-btn"
+        type="button"
+        disabled>
 
-    <script src="./app.js"></script>
+        🧹 پاک کردن انجام‌شده‌ها
+
+    </button>
+
+</div>
+
+        <!-- TASK LIST -->
+
+        <div
+            id="taskList"
+            class="task-list">
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         STATS PAGE
+    ========================== -->
+
+    <main
+        id="statsPage"
+        class="page">
+
+        <section class="section-title">
+
+            <h2>
+                آمار عملکرد 📊
+            </h2>
+
+            <p>
+                وضعیت کارهایت را ببین
+            </p>
+
+        </section>
+
+
+        <!-- BIG PROGRESS -->
+
+        <div class="big-stat">
+
+            <span>
+                میزان پیشرفت
+            </span>
+
+            <strong id="bigProgress">
+                0٪
+            </strong>
+
+            <div class="big-progress">
+
+                <div id="bigProgressBar"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATS CARDS -->
+
+        <div class="stats-grid">
+
+            <div class="info-card">
+
+                <span>
+                    📋
+                </span>
+
+                <strong id="statsTotal">
+                    0
+                </strong>
+
+                <small>
+                    کل کارها
+                </small>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>
+                    ✅
+                </span>
+
+                <strong id="statsCompleted">
+                    0
+                </strong>
+
+                <small>
+                    انجام شده
+                </small>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>
+                    ⏳
+                </span>
+
+                <strong id="statsRemaining">
+                    0
+                </strong>
+
+                <small>
+                    باقی مانده
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="statsMessage"
+            class="stats-message">
+
+            هنوز کاری ثبت نکردی.
+            اولین کارت رو اضافه کن! 🚀
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast">
+
+    <span id="toastIcon">
+        ✅
+    </span>
+
+    <span id="toastMessage">
+        انجام شد
+    </span>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script src="./app.js"></script>
 
 </body>
 
-</html>
+    </html>

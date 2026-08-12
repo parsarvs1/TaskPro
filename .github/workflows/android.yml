@@ -8,7 +8,6 @@ on:
       - main
       - master
 
-
 jobs:
   build:
     name: Build TaskPro Android APK
@@ -17,14 +16,14 @@ jobs:
     steps:
 
       # ==========================================
-      # 1. Checkout
+      # Checkout
       # ==========================================
       - name: Checkout
         uses: actions/checkout@v4
 
 
       # ==========================================
-      # 2. Node.js
+      # Node.js
       # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,7 +32,7 @@ jobs:
 
 
       # ==========================================
-      # 3. Java 21
+      # Java 21
       # ==========================================
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -43,15 +42,15 @@ jobs:
 
 
       # ==========================================
-      # 4. Check versions
+      # Check environment
       # ==========================================
       - name: Check environment
         run: |
-          echo "========== Java =========="
+          echo "========== JAVA =========="
           java -version
 
           echo ""
-          echo "========== Node =========="
+          echo "========== NODE =========="
           node --version
 
           echo ""
@@ -60,7 +59,7 @@ jobs:
 
 
       # ==========================================
-      # 5. package.json
+      # Prepare package.json
       # ==========================================
       - name: Prepare package.json
         run: |
@@ -70,7 +69,7 @@ jobs:
 
 
       # ==========================================
-      # 6. Install dependencies
+      # Install Capacitor
       # ==========================================
       - name: Install dependencies
         run: |
@@ -87,7 +86,7 @@ jobs:
 
 
       # ==========================================
-      # 7. Prepare WWW
+      # Prepare WWW
       # ==========================================
       - name: Prepare web files
         run: |
@@ -112,7 +111,7 @@ jobs:
 
 
       # ==========================================
-      # 8. Check icon
+      # Check icon
       # ==========================================
       - name: Check icon
         run: |
@@ -126,7 +125,7 @@ jobs:
 
 
       # ==========================================
-      # 9. Capacitor Config
+      # Capacitor config
       # ==========================================
       - name: Create Capacitor config
         run: |
@@ -140,7 +139,7 @@ jobs:
 
 
       # ==========================================
-      # 10. Add Android
+      # Add Android
       # ==========================================
       - name: Add Android
         run: |
@@ -148,7 +147,7 @@ jobs:
 
 
       # ==========================================
-      # 11. Prepare resources
+      # Prepare icon
       # ==========================================
       - name: Prepare icon resources
         run: |
@@ -162,7 +161,7 @@ jobs:
 
 
       # ==========================================
-      # 12. Generate Android icons
+      # Generate Android icons
       # ==========================================
       - name: Generate Android icons
         run: |
@@ -170,7 +169,49 @@ jobs:
 
 
       # ==========================================
-      # 13. Sync Capacitor
+      # Fix Kotlin dependencies
+      # ==========================================
+      - name: Fix Kotlin dependencies
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          gradle_file = Path("android/build.gradle")
+
+          text = gradle_file.read_text()
+
+          fix = r'''
+
+          // ==========================================
+          // TaskPro Kotlin dependency compatibility
+          // ==========================================
+          allprojects {
+              configurations.configureEach {
+                  exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-jdk7"
+                  exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-jdk8"
+
+                  resolutionStrategy {
+                      force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
+                  }
+              }
+          }
+          '''
+
+          if "TaskPro Kotlin dependency compatibility" not in text:
+              text += fix
+
+          gradle_file.write_text(text)
+          PY
+
+          echo "Kotlin dependency fix applied."
+
+          echo ""
+          echo "========== android/build.gradle =========="
+          cat android/build.gradle
+
+
+      # ==========================================
+      # Capacitor Sync
       # ==========================================
       - name: Capacitor Sync
         run: |
@@ -178,11 +219,11 @@ jobs:
 
 
       # ==========================================
-      # 14. Verify icons
+      # Verify icons
       # ==========================================
       - name: Verify Android icons
         run: |
-          echo "========== Android launcher icons =========="
+          echo "========== Launcher icons =========="
 
           find android/app/src/main/res \
             -type f \
@@ -191,12 +232,10 @@ jobs:
 
 
       # ==========================================
-      # 15. Configure Gradle memory
+      # Configure Gradle
       # ==========================================
       - name: Configure Gradle
         run: |
-          mkdir -p android
-
           cat > android/gradle.properties <<'EOF'
           org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           org.gradle.daemon=false
@@ -207,7 +246,17 @@ jobs:
 
 
       # ==========================================
-      # 16. Build APK
+      # Clean Gradle
+      # ==========================================
+      - name: Clean Gradle
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew clean --no-daemon
+
+
+      # ==========================================
+      # Build APK
       # ==========================================
       - name: Build Debug APK
         working-directory: android
@@ -222,7 +271,7 @@ jobs:
 
 
       # ==========================================
-      # 17. Check APK
+      # Check APK
       # ==========================================
       - name: Check APK
         run: |
@@ -237,7 +286,7 @@ jobs:
 
 
       # ==========================================
-      # 18. Upload APK
+      # Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4

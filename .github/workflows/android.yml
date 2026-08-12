@@ -3,10 +3,12 @@ name: Build TaskPro APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,42 +18,57 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 20
+
+      - name: Create package.json
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Capacitor
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Initialize Capacitor
+        run: |
+          if [ ! -d android ]; then
+            npx cap init TaskPro com.taskpro.app --web-dir=www
+          fi
+
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp -r ./* www/ 2>/dev/null || true
+          rm -rf www/www
+          rm -rf www/android
+
+      - name: Add Android
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor
+        run: npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: 17
 
-      - name: Prepare web files
-        run: npm run prepare:web
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
-      - name: Build Debug APK
+      - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Rename APK
-        run: |
-          mkdir -p release
-          cp android/app/build/outputs/apk/debug/app-debug.apk release/TaskPro.apk
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: TaskPro-APK
-          path: release/TaskPro.apk
-          retention-days: 30
-          
+          path: android/app/build/outputs/apk/debug/app-debug.apk

@@ -29,7 +29,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-          cache: gradle
 
 
       # ==========================================
@@ -39,26 +38,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
 
       # ==========================================
-      # 4. Check versions
+      # 4. Show versions
       # ==========================================
       - name: Check versions
         run: |
           echo "========== JAVA =========="
           java -version
 
+          echo ""
           echo "========== NODE =========="
           node --version
 
+          echo ""
           echo "========== NPM =========="
           npm --version
 
 
       # ==========================================
-      # 5. Install npm dependencies
+      # 5. Install npm packages
       # ==========================================
       - name: Install dependencies
         run: |
@@ -73,7 +73,7 @@ jobs:
 
 
       # ==========================================
-      # 6. Build web app
+      # 6. Prepare www
       # ==========================================
       - name: Prepare web files
         run: |
@@ -87,27 +87,27 @@ jobs:
           cp sw.js www/
 
           echo "========== WWW =========="
-          ls -la www
+          ls -lah www
 
 
       # ==========================================
       # 7. Check icon
       # ==========================================
-      - name: Check application icon
+      - name: Check icon
         run: |
+          echo "========== ICON =========="
+
           if [ ! -f "icon.png" ]; then
             echo "ERROR: icon.png not found!"
             exit 1
           fi
 
           file icon.png
-
-          echo "Icon exists:"
           ls -lh icon.png
 
 
       # ==========================================
-      # 8. Capacitor config
+      # 8. Create Capacitor config
       # ==========================================
       - name: Create Capacitor config
         run: |
@@ -115,32 +115,30 @@ jobs:
           {
             "appId": "com.parsa.taskpro",
             "appName": "TaskPro",
-            "webDir": "www",
-            "bundledWebRuntime": false
+            "webDir": "www"
           }
           EOF
 
+          echo "========== CAPACITOR CONFIG =========="
           cat capacitor.config.json
 
 
       # ==========================================
-      # 9. Clean old Android project
+      # 9. Prepare resources
       # ==========================================
-      - name: Prepare Android project
+      - name: Prepare app icon resources
         run: |
-          rm -rf android
           rm -rf resources
-
           mkdir -p resources
 
           cp icon.png resources/icon.png
 
-          echo "Icon copied:"
+          echo "========== RESOURCE ICON =========="
           file resources/icon.png
 
 
       # ==========================================
-      # 10. Add Android platform
+      # 10. Add Android
       # ==========================================
       - name: Add Android platform
         run: |
@@ -156,7 +154,21 @@ jobs:
 
 
       # ==========================================
-      # 12. Force Kotlin version
+      # 12. Configure Gradle
+      # ==========================================
+      - name: Configure Gradle
+        run: |
+          cat >> android/gradle.properties <<'EOF'
+
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          org.gradle.daemon=false
+          org.gradle.parallel=false
+          org.gradle.caching=true
+          EOF
+
+
+      # ==========================================
+      # 13. Fix Kotlin duplicate dependencies
       # ==========================================
       - name: Fix Kotlin dependencies
         run: |
@@ -165,28 +177,12 @@ jobs:
           allprojects {
               configurations.all {
                   resolutionStrategy {
-                      force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
-                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
-                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+                      force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
+                      force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"
+                      force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
                   }
               }
           }
-          EOF
-
-          echo "Kotlin dependency fix added."
-
-
-      # ==========================================
-      # 13. Gradle properties
-      # ==========================================
-      - name: Configure Gradle
-        run: |
-          cat >> android/gradle.properties <<'EOF'
-
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          org.gradle.daemon=false
-          org.gradle.parallel=true
-          org.gradle.caching=true
           EOF
 
 
@@ -199,22 +195,38 @@ jobs:
 
 
       # ==========================================
-      # 15. Verify Android icons
+      # 15. Check Android project
       # ==========================================
-      - name: Verify Android icons
+      - name: Check Android project
         run: |
-          echo "========== ICON FILES =========="
+          echo "========== ANDROID =========="
+          ls -lah android
 
+          echo ""
+          echo "========== GRADLE =========="
+          ls -lah android/gradle
+
+          echo ""
+          echo "========== GRADLE WRAPPER =========="
+          ls -lah android/gradle/wrapper
+
+          echo ""
+          echo "========== ICON FILES =========="
           find android/app/src/main/res \
             -type f \
-            \( -name "ic_launcher*" -o -name "*launcher*" \) \
+            \( \
+              -name "ic_launcher.png" \
+              -o -name "ic_launcher_round.png" \
+              -o -name "ic_launcher_foreground.png" \
+              -o -name "ic_launcher.xml" \
+            \) \
             | sort
 
 
       # ==========================================
-      # 16. Gradle wrapper
+      # 16. Make Gradle executable
       # ==========================================
-      - name: Prepare Gradle
+      - name: Make Gradle executable
         working-directory: android
         run: |
           chmod +x gradlew
@@ -237,7 +249,7 @@ jobs:
       # ==========================================
       - name: Find APK
         run: |
-          echo "========== APK FILES =========="
+          echo "========== APK =========="
 
           find android/app/build/outputs/apk \
             -type f \

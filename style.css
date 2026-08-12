@@ -1,0 +1,885 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+
+    font-family: Arial, sans-serif;
+
+    background: #f1f3f8;
+
+    color: #222;
+
+    min-height: 100vh;
+
+    transition:
+        background 0.3s,
+        color 0.3s;
+}
+
+
+.app {
+
+    width: 92%;
+
+    max-width: 600px;
+
+    margin: 40px auto;
+
+}
+
+
+/* =========================
+   Header
+========================= */
+
+header {
+
+    margin-bottom: 25px;
+
+}
+
+
+.header-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+header h1 {
+
+    font-size: 34px;
+
+    margin-bottom: 8px;
+
+}
+
+
+header p {
+
+    color: #777;
+
+}
+
+
+/* =========================
+   Dark Mode
+========================= */
+
+.dark-mode-btn {
+
+    width: 48px;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: white;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   Input
+========================= */
+
+.input-box {
+
+    display: flex;
+
+    gap: 8px;
+
+    background: white;
+
+    padding: 10px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.07);
+
+}
+
+
+.input-box input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 16px;
+
+    padding: 10px;
+
+    background: transparent;
+
+    color: #222;
+
+}
+
+
+#prioritySelect {
+
+    border: none;
+
+    outline: none;
+
+    border-radius: 10px;
+
+    padding: 0 8px;
+
+    background: #f1f3f8;
+
+    color: #333;
+
+    cursor: pointer;
+
+}
+
+
+.input-box button {
+
+    width: 48px;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 13px;
+
+    background: #5b5bf7;
+
+    color: white;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   Statistics
+========================= */
+
+.stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin: 20px 0;
+
+}
+
+
+.stat {
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+}
+
+
+.stat span {
+
+    display: block;
+
+    font-size: 25px;
+
+    font-weight: bold;
+
+    color: #5b5bf7;
+
+    margin-bottom: 5px;
+
+}
+
+
+.stat small {
+
+    color: #777;
+
+}
+
+
+/* =========================
+   Progress
+========================= */
+
+.progress-box {
+
+    background: white;
+
+    padding: 16px;
+
+    border-radius: 15px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.progress {
+
+    width: 100%;
+
+    height: 10px;
+
+    background: #eee;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+}
+
+
+#progressBar {
+
+    width: 0%;
+
+    height: 100%;
+
+    background: #5b5bf7;
+
+    transition: width 0.3s;
+
+}
+
+
+.progress-box p {
+
+    text-align: center;
+
+    margin-top: 10px;
+
+    color: #777;
+
+}
+
+
+/* =========================
+   Tasks
+========================= */
+
+.task-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.task {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
+
+}
+
+
+.task input {
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+
+.task-text {
+
+    flex: 1;
+
+    font-size: 16px;
+
+}
+
+
+.task.completed .task-text {
+
+    text-decoration: line-through;
+
+    color: #999;
+
+}
+
+
+/* =========================
+   Priority
+========================= */
+
+.priority {
+
+    font-size: 13px;
+
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    white-space: nowrap;
+
+}
+
+
+.priority-low {
+
+    background: #e7f8ed;
+
+    color: #16843b;
+
+}
+
+
+.priority-medium {
+
+    background: #fff4cc;
+
+    color: #9a7600;
+
+}
+
+
+.priority-high {
+
+    background: #ffe5e5;
+
+    color: #d62828;
+
+}
+
+
+/* =========================
+   Task Buttons
+========================= */
+
+.task-actions {
+
+    display: flex;
+
+    gap: 5px;
+
+}
+
+
+.edit-btn,
+.delete-btn {
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+}
+
+
+.edit-btn {
+
+    background: #eeeeff;
+
+    color: #4b4bd6;
+
+}
+
+
+.delete-btn {
+
+    background: #ffecec;
+
+    color: #e53935;
+
+}
+
+
+/* =========================
+   Edit Area
+========================= */
+
+.edit-area {
+
+    display: flex;
+
+    flex: 1;
+
+    gap: 7px;
+
+}
+
+
+.edit-input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 9px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    font-size: 14px;
+
+}
+
+
+.edit-select {
+
+    border: 1px solid #ddd;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    padding: 5px;
+
+}
+
+
+.save-edit {
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 0 12px;
+
+    background: #5b5bf7;
+
+    color: white;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   Dark Mode
+========================= */
+
+body.dark {
+
+    background: #121212;
+
+    color: #eee;
+
+}
+
+
+body.dark header p {
+
+    color: #aaa;
+
+}
+
+
+body.dark .dark-mode-btn {
+
+    background: #242424;
+
+    color: white;
+
+}
+
+
+body.dark .input-box {
+
+    background: #1e1e1e;
+
+    box-shadow: none;
+
+}
+
+
+body.dark .input-box input {
+
+    color: white;
+
+}
+
+
+body.dark #prioritySelect {
+
+    background: #292929;
+
+    color: white;
+
+}
+
+
+body.dark .stat {
+
+    background: #1e1e1e;
+
+}
+
+
+body.dark .stat small {
+
+    color: #aaa;
+
+}
+
+
+body.dark .progress-box {
+
+    background: #1e1e1e;
+
+}
+
+
+body.dark .progress {
+
+    background: #333;
+
+}
+
+
+body.dark .progress-box p {
+
+    color: #aaa;
+
+}
+
+
+body.dark .task {
+
+    background: #1e1e1e;
+
+    box-shadow: none;
+
+}
+
+
+body.dark .edit-btn {
+
+    background: #29294a;
+
+    color: #aaaaff;
+
+}
+
+
+body.dark .delete-btn {
+
+    background: #351f1f;
+
+}
+
+
+body.dark .edit-input,
+body.dark .edit-select {
+
+    background: #292929;
+
+    color: white;
+
+    border-color: #444;
+
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 500px) {
+
+    .app {
+
+        margin: 25px auto;
+
+    }
+
+
+    header h1 {
+
+        font-size: 30px;
+
+    }
+
+
+    .input-box {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .input-box input {
+
+        width: 100%;
+
+        flex-basis: 100%;
+
+    }
+
+
+    #prioritySelect {
+
+        height: 42px;
+
+        flex: 1;
+
+    }
+
+
+    .input-box button {
+
+        height: 42px;
+
+    }
+
+
+    .stats {
+
+        gap: 7px;
+
+    }
+
+
+    .stat {
+
+        padding: 12px 5px;
+
+    }
+
+
+    .stat span {
+
+        font-size: 21px;
+
+    }
+
+
+    .stat small {
+
+        font-size: 11px;
+
+    }
+
+
+    .task {
+
+        padding: 12px;
+
+    }
+
+
+    .priority {
+
+        font-size: 11px;
+
+        padding: 4px 6px;
+
+    }
+
+}
+/* =========================
+   Filters
+========================= */
+
+.filters {
+
+    display: flex;
+
+    gap: 7px;
+
+    overflow-x: auto;
+
+    margin-bottom: 12px;
+
+    padding-bottom: 3px;
+
+}
+
+
+.filter-btn {
+
+    border: none;
+
+    background: white;
+
+    color: #666;
+
+    padding: 9px 13px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: 0.2s;
+
+}
+
+
+.filter-btn:hover {
+
+    transform: translateY(-1px);
+
+}
+
+
+.filter-btn.active {
+
+    background: #5b5bf7;
+
+    color: white;
+
+}
+
+
+/* =========================
+   Sort
+========================= */
+
+.sort-box {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+
+    padding: 10px 13px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+#sortSelect {
+
+    border: none;
+
+    outline: none;
+
+    background: #f1f3f8;
+
+    color: #333;
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   Dark Mode
+========================= */
+
+body.dark .filter-btn {
+
+    background: #1e1e1e;
+
+    color: #aaa;
+
+}
+
+
+body.dark .filter-btn.active {
+
+    background: #5b5bf7;
+
+    color: white;
+
+}
+
+
+body.dark .sort-box {
+
+    background: #1e1e1e;
+
+    color: #aaa;
+
+}
+
+
+body.dark #sortSelect {
+
+    background: #292929;
+
+    color: white;
+
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 500px) {
+
+    .filter-btn {
+
+        font-size: 12px;
+
+        padding: 8px 10px;
+
+    }
+
+}

@@ -1,7 +1,7 @@
 {
   "name": "TaskPro",
   "short_name": "TaskPro",
-  "description": "A simple and smart task management app.",
+  "description": "مدیریت هوشمند کارها",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -12,10 +12,16 @@
   "dir": "rtl",
   "icons": [
     {
-      "src": "./icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

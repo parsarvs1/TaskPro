@@ -1,405 +1,256 @@
 name: Build TaskPro APK
 
 on:
-  workflow_dispatch:
-
   push:
     branches:
       - main
-      - master
 
+  workflow_dispatch:
 
 jobs:
-
   build:
-
     name: Build TaskPro Android APK
-
     runs-on: ubuntu-latest
-
 
     steps:
 
-
-      # ========================================
-      # CHECKOUT
-      # ========================================
-
-      - name: Checkout
+      # ==========================================
+      # 1. Checkout
+      # ==========================================
+      - name: Checkout repository
         uses: actions/checkout@v4
 
 
-      # ========================================
-      # NODE
-      # ========================================
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-
-        with:
-          node-version: 22
-
-
-      # ========================================
-      # JAVA
-      # ========================================
-
+      # ==========================================
+      # 2. Java 21
+      # ==========================================
       - name: Setup Java 21
         uses: actions/setup-java@v4
-
         with:
           distribution: temurin
-          java-version: 21
+          java-version: "21"
+          cache: gradle
 
 
-      # ========================================
-      # CHECK VERSIONS
-      # ========================================
+      # ==========================================
+      # 3. Node.js
+      # ==========================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
 
-      - name: Check environment
+
+      # ==========================================
+      # 4. Check versions
+      # ==========================================
+      - name: Check versions
         run: |
-
+          echo "========== JAVA =========="
           java -version
 
+          echo "========== NODE =========="
           node --version
 
+          echo "========== NPM =========="
           npm --version
 
 
-      # ========================================
-      # INSTALL
-      # ========================================
-
+      # ==========================================
+      # 5. Install npm dependencies
+      # ==========================================
       - name: Install dependencies
         run: |
-
           npm install \
             --no-audit \
-            --no-fund
+            --no-fund \
+            --prefer-offline \
+            --fetch-retries=5 \
+            --fetch-retry-factor=2 \
+            --fetch-retry-mintimeout=10000 \
+            --fetch-retry-maxtimeout=120000
 
 
-      # ========================================
-      # PREPARE WWW
-      # ========================================
-
+      # ==========================================
+      # 6. Build web app
+      # ==========================================
       - name: Prepare web files
         run: |
-
           rm -rf www
-
           mkdir -p www
 
-
           cp index.html www/
-
           cp app.js www/
-
           cp style.css www/
+          cp manifest.json www/
+          cp sw.js www/
 
-          cp icon.png www/
+          echo "========== WWW =========="
+          ls -la www
 
 
-          if [ -f manifest.json ]; then
-
-            cp manifest.json www/
-
+      # ==========================================
+      # 7. Check icon
+      # ==========================================
+      - name: Check application icon
+        run: |
+          if [ ! -f "icon.png" ]; then
+            echo "ERROR: icon.png not found!"
+            exit 1
           fi
 
+          file icon.png
 
-          if [ -f sw.js ]; then
-
-            cp sw.js www/
-
-          fi
+          echo "Icon exists:"
+          ls -lh icon.png
 
 
-      # ========================================
-      # CAPACITOR CONFIG
-      # ========================================
-
+      # ==========================================
+      # 8. Capacitor config
+      # ==========================================
       - name: Create Capacitor config
         run: |
-
           cat > capacitor.config.json <<'EOF'
-
           {
-            "appId": "com.taskpro.app",
+            "appId": "com.parsa.taskpro",
             "appName": "TaskPro",
-            "webDir": "www"
+            "webDir": "www",
+            "bundledWebRuntime": false
           }
-
           EOF
 
+          cat capacitor.config.json
 
-      # ========================================
-      # ADD ANDROID
-      # ========================================
 
-      - name: Add Android
+      # ==========================================
+      # 9. Clean old Android project
+      # ==========================================
+      - name: Prepare Android project
         run: |
-
           rm -rf android
+          rm -rf resources
 
+          mkdir -p resources
+
+          cp icon.png resources/icon.png
+
+          echo "Icon copied:"
+          file resources/icon.png
+
+
+      # ==========================================
+      # 10. Add Android platform
+      # ==========================================
+      - name: Add Android platform
+        run: |
           npx cap add android
 
 
-      # ========================================
-      # INSTALL IMAGEMAGICK
-      # ========================================
-
-      - name: Install ImageMagick
+      # ==========================================
+      # 11. Generate Android icons
+      # ==========================================
+      - name: Generate Android icons
         run: |
-
-          sudo apt-get update -y
-
-          sudo apt-get install -y imagemagick
+          npx capacitor-assets generate --android
 
 
-      # ========================================
-      # ANDROID ICON
-      # ========================================
-
-      - name: Generate Android launcher icons
+      # ==========================================
+      # 12. Force Kotlin version
+      # ==========================================
+      - name: Fix Kotlin dependencies
         run: |
+          cat >> android/build.gradle <<'EOF'
 
-          RES="android/app/src/main/res"
+          allprojects {
+              configurations.all {
+                  resolutionStrategy {
+                      force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+                  }
+              }
+          }
+          EOF
 
-
-          mkdir -p "$RES/mipmap-mdpi"
-
-          mkdir -p "$RES/mipmap-hdpi"
-
-          mkdir -p "$RES/mipmap-xhdpi"
-
-          mkdir -p "$RES/mipmap-xxhdpi"
-
-          mkdir -p "$RES/mipmap-xxxhdpi"
-
-
-          convert icon.png \
-            -resize 48x48 \
-            "$RES/mipmap-mdpi/ic_launcher.png"
+          echo "Kotlin dependency fix added."
 
 
-          convert icon.png \
-            -resize 72x72 \
-            "$RES/mipmap-hdpi/ic_launcher.png"
-
-
-          convert icon.png \
-            -resize 96x96 \
-            "$RES/mipmap-xhdpi/ic_launcher.png"
-
-
-          convert icon.png \
-            -resize 144x144 \
-            "$RES/mipmap-xxhdpi/ic_launcher.png"
-
-
-          convert icon.png \
-            -resize 192x192 \
-            "$RES/mipmap-xxxhdpi/ic_launcher.png"
-
-
-          cp \
-            "$RES/mipmap-mdpi/ic_launcher.png" \
-            "$RES/mipmap-mdpi/ic_launcher_round.png"
-
-
-          cp \
-            "$RES/mipmap-hdpi/ic_launcher.png" \
-            "$RES/mipmap-hdpi/ic_launcher_round.png"
-
-
-          cp \
-            "$RES/mipmap-xhdpi/ic_launcher.png" \
-            "$RES/mipmap-xhdpi/ic_launcher_round.png"
-
-
-          cp \
-            "$RES/mipmap-xxhdpi/ic_launcher.png" \
-            "$RES/mipmap-xxhdpi/ic_launcher_round.png"
-
-
-          cp \
-            "$RES/mipmap-xxxhdpi/ic_launcher.png" \
-            "$RES/mipmap-xxxhdpi/ic_launcher_round.png"
-
-
-          echo "================================"
-
-          echo "TaskPro icons created"
-
-          echo "================================"
-
-
-      # ========================================
-      # FIX MANIFEST
-      # ========================================
-
-      - name: Configure Android manifest
+      # ==========================================
+      # 13. Gradle properties
+      # ==========================================
+      - name: Configure Gradle
         run: |
+          cat >> android/gradle.properties <<'EOF'
 
-          python3 <<'PY'
-
-          from pathlib import Path
-
-
-          path = Path(
-              "android/app/src/main/AndroidManifest.xml"
-          )
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          org.gradle.daemon=false
+          org.gradle.parallel=true
+          org.gradle.caching=true
+          EOF
 
 
-          text = path.read_text()
-
-
-          text = text.replace(
-              'android:icon="@mipmap/ic_launcher"',
-              'android:icon="@mipmap/ic_launcher"'
-          )
-
-
-          if "android:roundIcon=" not in text:
-
-              text = text.replace(
-
-                  'android:icon="@mipmap/ic_launcher"',
-
-                  'android:icon="@mipmap/ic_launcher" '
-                  'android:roundIcon="@mipmap/ic_launcher_round"',
-
-                  1
-
-              )
-
-
-          path.write_text(text)
-
-          PY
-
-
-      # ========================================
-      # SYNC
-      # ========================================
-
-      - name: Capacitor sync
+      # ==========================================
+      # 14. Sync Capacitor
+      # ==========================================
+      - name: Sync Capacitor
         run: |
-
           npx cap sync android
 
 
-      # ========================================
-      # KOTLIN FIX
-      # ========================================
-
-      - name: Fix Kotlin dependencies
+      # ==========================================
+      # 15. Verify Android icons
+      # ==========================================
+      - name: Verify Android icons
         run: |
+          echo "========== ICON FILES =========="
 
-          cat >> android/build.gradle <<'EOF'
-
-
-          allprojects {
-
-              configurations.configureEach {
-
-                  exclude group:
-                      "org.jetbrains.kotlin",
-                      module:
-                      "kotlin-stdlib-jdk7"
+          find android/app/src/main/res \
+            -type f \
+            \( -name "ic_launcher*" -o -name "*launcher*" \) \
+            | sort
 
 
-                  exclude group:
-                      "org.jetbrains.kotlin",
-                      module:
-                      "kotlin-stdlib-jdk8"
-
-
-                  resolutionStrategy {
-
-                      force(
-                          "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
-                      )
-
-                  }
-
-              }
-
-          }
-
-          EOF
-
-
-      # ========================================
-      # GRADLE PROPERTIES
-      # ========================================
-
-      - name: Configure Gradle
-        run: |
-
-          cat > android/gradle.properties <<'EOF'
-
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-
-          org.gradle.daemon=false
-
-          org.gradle.parallel=false
-
-          org.gradle.workers.max=2
-
-          android.useAndroidX=true
-
-          EOF
-
-
-      # ========================================
-      # BUILD
-      # ========================================
-
-      - name: Build APK
+      # ==========================================
+      # 16. Gradle wrapper
+      # ==========================================
+      - name: Prepare Gradle
         working-directory: android
         run: |
-
           chmod +x gradlew
 
 
-          ./gradlew clean \
-            --no-daemon
-
-
+      # ==========================================
+      # 17. Build APK
+      # ==========================================
+      - name: Build Debug APK
+        working-directory: android
+        run: |
           ./gradlew assembleDebug \
             --no-daemon \
             --stacktrace \
-            --max-workers=2
+            --no-parallel
 
 
-      # ========================================
-      # CHECK APK
-      # ========================================
-
-      - name: Check APK
+      # ==========================================
+      # 18. Find APK
+      # ==========================================
+      - name: Find APK
         run: |
+          echo "========== APK FILES =========="
 
-          echo "APK files:"
-
-
-          find android/app/build \
-            -name "*.apk" \
+          find android/app/build/outputs/apk \
             -type f \
-            -exec ls -lh {} \;
+            -name "*.apk" \
+            -print
 
 
-      # ========================================
-      # UPLOAD APK
-      # ========================================
-
+      # ==========================================
+      # 19. Upload APK
+      # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
-
         with:
-
-          name: TaskPro-APK
-
-          path:
-            android/app/build/outputs/apk/debug/app-debug.apk
-
+          name: TaskPro-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error

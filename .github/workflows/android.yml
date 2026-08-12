@@ -13,30 +13,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. دریافت پروژه
+
+      # -----------------------------
+      # Get source code
+      # -----------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. نصب Node.js
+
+      # -----------------------------
+      # Node.js
+      # -----------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. ساخت package.json در صورت نبودن
+
+      # -----------------------------
+      # Java 21
+      # Capacitor Android requires Java 21
+      # -----------------------------
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+
+      # -----------------------------
+      # Prepare package.json
+      # -----------------------------
       - name: Prepare package.json
         run: |
           if [ ! -f package.json ]; then
             npm init -y
           fi
 
-      # 4. نصب وابستگی‌ها
+
+      # -----------------------------
+      # Install dependencies
+      # -----------------------------
       - name: Install dependencies
         run: |
-          npm install
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install --no-audit --no-fund
+          npm install @capacitor/core @capacitor/cli @capacitor/android --no-audit --no-fund
 
-      # 5. ساخت پوشه www
+
+      # -----------------------------
+      # Prepare web files
+      # -----------------------------
       - name: Prepare web files
         run: |
           rm -rf www
@@ -58,7 +84,10 @@ jobs:
             cp -r icons www/
           fi
 
-      # 6. ساخت Capacitor
+
+      # -----------------------------
+      # Capacitor configuration
+      # -----------------------------
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
@@ -70,31 +99,45 @@ jobs:
           }
           EOF
 
-      # 7. اضافه کردن Android
+
+      # -----------------------------
+      # Add Android platform
+      # -----------------------------
       - name: Add Android
         run: |
           npx cap add android
 
-      # 8. Sync
+
+      # -----------------------------
+      # Sync web project with Android
+      # -----------------------------
       - name: Capacitor Sync
         run: |
           npx cap sync android
 
-      # 9. Java
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
 
-      # 10. ساخت APK
-      - name: Build APK
+      # -----------------------------
+      # Show Java version
+      # -----------------------------
+      - name: Check Java
+        run: |
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
+
+      # -----------------------------
+      # Build APK
+      # -----------------------------
+      - name: Build Debug APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      # 11. دریافت APK
+
+      # -----------------------------
+      # Upload APK
+      # -----------------------------
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

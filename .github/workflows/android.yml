@@ -1,0 +1,83 @@
+name: Build TaskPro APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build-android:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v6
+
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+
+      # Create web directory
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp style.css www/
+          cp app.js www/
+          cp manifest.json www/
+          cp sw.js www/
+          cp -r icons www/
+
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+
+      # Add Android platform
+      - name: Add Android
+        run: npx cap add android
+
+
+      # Sync Capacitor
+      - name: Sync Android
+        run: npx cap sync android
+
+
+      # Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+
+      # Build APK
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+
+      # Rename APK
+      - name: Rename APK
+        run: |
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk release/TaskPro-v1.1.1.apk
+
+
+      # Upload APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaskPro-APK
+          path: release/TaskPro-v1.1.1.apk
+          retention-days: 30

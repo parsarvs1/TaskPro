@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>TaskPro</title>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header>
+
+            <div class="header-top">
+
+                <div>
+                    <h1>TaskPro 🚀</h1>
+
+                    <p>
+                        کارهای امروزت رو مدیریت کن
+                    </p>
+                </div>
+
+                <button
+                    id="darkModeBtn"
+                    class="dark-mode-btn">
+
+                    🌙
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- Add Task -->
+
+        <div class="input-box">
+
+            <input
+                type="text"
+                id="taskInput"
+                placeholder="یک کار جدید بنویس..."
+            >
+
+            <select id="prioritySelect">
+
+                <option value="low">
+                    🟢 کم
+                </option>
+
+                <option value="medium" selected>
+                    🟡 متوسط
+                </option>
+
+                <option value="high">
+                    🔴 زیاد
+                </option>
+
+            </select>
+
+            <button id="addBtn">
+                +
+            </button>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <span id="totalTasks">0</span>
+
+                <small>
+                    کل کارها
+                </small>
+
+            </div>
+
+            <div class="stat">
+
+                <span id="completedTasks">0</span>
+
+                <small>
+                    انجام شده
+                </small>
+
+            </div>
+
+            <div class="stat">
+
+                <span id="remainingTasks">0</span>
+
+                <small>
+                    باقی مانده
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- Progress -->
+
+        <div class="progress-box">
+
+            <div class="progress">
+
+                <div id="progressBar"></div>
+
+            </div>
+
+            <p id="progressText">
+                0٪ انجام شده
+            </p>
+
+        </div>
+
+<!-- Filters -->
+
+<div class="filters">
+
+    <button class="filter-btn active" data-filter="all">
+        همه
+    </button>
+
+    <button class="filter-btn" data-filter="active">
+        انجام‌نشده
+    </button>
+
+    <button class="filter-btn" data-filter="completed">
+        انجام‌شده
+    </button>
+
+    <button class="filter-btn" data-filter="high">
+        🔴 مهم
+    </button>
+
+</div>
+
+
+<!-- Sort -->
+
+<div class="sort-box">
+
+    <label for="sortSelect">
+        مرتب‌سازی:
+    </label>
+
+    <select id="sortSelect">
+
+        <option value="newest">
+            جدیدترین
+        </option>
+
+        <option value="oldest">
+            قدیمی‌ترین
+        </option>
+
+        <option value="priority">
+            بر اساس اولویت
+        </option>
+
+    </select>
+
+</div>
+
+        <!-- Tasks -->
+
+        <div
+            id="taskList"
+            class="task-list">
+
+        </div>
+
+    </div>
+
+
+    <script src="./app.js"></script>
+
+</body>
+
+</html>

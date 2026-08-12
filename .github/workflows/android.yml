@@ -9,66 +9,95 @@ on:
 
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
+      # 1. دریافت پروژه
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. نصب Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Create package.json
+      # 3. ساخت package.json در صورت نبودن
+      - name: Prepare package.json
         run: |
           if [ ! -f package.json ]; then
             npm init -y
           fi
 
+      # 4. نصب وابستگی‌ها
       - name: Install dependencies
-        run: npm install
-
-      - name: Install Capacitor
         run: |
+          npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Initialize Capacitor
-        run: |
-          if [ ! -d android ]; then
-            npx cap init TaskPro com.taskpro.app --web-dir=www
-          fi
-
+      # 5. ساخت پوشه www
       - name: Prepare web files
         run: |
+          rm -rf www
           mkdir -p www
-          cp -r ./* www/ 2>/dev/null || true
-          rm -rf www/www
-          rm -rf www/android
 
-      - name: Add Android
-        run: |
-          if [ ! -d android ]; then
-            npx cap add android
+          cp index.html www/
+          cp app.js www/
+          cp style.css www/
+
+          if [ -f manifest.json ]; then
+            cp manifest.json www/
           fi
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+          if [ -f sw.js ]; then
+            cp sw.js www/
+          fi
 
+          if [ -d icons ]; then
+            cp -r icons www/
+          fi
+
+      # 6. ساخت Capacitor
+      - name: Create Capacitor config
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.taskpro.app",
+            "appName": "TaskPro",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }
+          EOF
+
+      # 7. اضافه کردن Android
+      - name: Add Android
+        run: |
+          npx cap add android
+
+      # 8. Sync
+      - name: Capacitor Sync
+        run: |
+          npx cap sync android
+
+      # 9. Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # 10. ساخت APK
       - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
+      # 11. دریافت APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: TaskPro-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

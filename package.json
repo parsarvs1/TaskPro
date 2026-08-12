@@ -3,7 +3,9 @@
   "version": "1.1.1",
   "private": true,
   "scripts": {
-    "build:android": "npx cap sync android"
+    "prepare:web": "node -e \"const fs=require('fs'); fs.mkdirSync('www',{recursive:true}); for(const f of ['index.html','style.css','app.js','manifest.json','sw.js']) fs.copyFileSync(f,'www/'+f); fs.cpSync('icons','www/icons',{recursive:true});\"",
+    "build:android": "npm run prepare:web && npx cap sync android",
+    "open:android": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.0",

@@ -13,7 +13,7 @@ jobs:
 
       # Checkout repository
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
 
 
       # Setup Node.js
@@ -76,7 +76,7 @@ jobs:
 
       # Upload APK
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: TaskPro-APK
           path: release/TaskPro-v1.1.1.apk

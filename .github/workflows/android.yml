@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build TaskPro Android APK
+    name: Build TaskPro Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -41,24 +41,7 @@ jobs:
 
 
       # ==========================================
-      # 4. Check versions
-      # ==========================================
-      - name: Check versions
-        run: |
-          echo "========== JAVA =========="
-          java -version
-
-          echo ""
-          echo "========== NODE =========="
-          node --version
-
-          echo ""
-          echo "========== NPM =========="
-          npm --version
-
-
-      # ==========================================
-      # 5. Install dependencies
+      # 4. Install dependencies
       # ==========================================
       - name: Install dependencies
         run: |
@@ -73,7 +56,7 @@ jobs:
 
 
       # ==========================================
-      # 6. Prepare WWW
+      # 5. Prepare WWW
       # ==========================================
       - name: Prepare web files
         run: |
@@ -86,12 +69,12 @@ jobs:
           cp manifest.json www/
           cp sw.js www/
 
-          echo "========== WWW =========="
+          echo "WWW files:"
           ls -lah www
 
 
       # ==========================================
-      # 7. Check icon
+      # 6. Check icon
       # ==========================================
       - name: Check icon
         run: |
@@ -100,13 +83,12 @@ jobs:
             exit 1
           fi
 
-          echo "========== ICON =========="
           file icon.png
           ls -lh icon.png
 
 
       # ==========================================
-      # 8. Create Capacitor config
+      # 7. Capacitor config
       # ==========================================
       - name: Create Capacitor config
         run: |
@@ -122,17 +104,16 @@ jobs:
 
 
       # ==========================================
-      # 9. Prepare Android
+      # 8. Create Android
       # ==========================================
       - name: Prepare Android
         run: |
           rm -rf android
-
           npx cap add android
 
 
       # ==========================================
-      # 10. Install ImageMagick
+      # 9. Install ImageMagick
       # ==========================================
       - name: Install ImageMagick
         run: |
@@ -141,22 +122,14 @@ jobs:
 
 
       # ==========================================
-      # 11. Generate Android icons manually
+      # 10. Generate Android icons
       # ==========================================
       - name: Generate Android icons
         run: |
           set -e
 
-          echo "========== Preparing icons =========="
-
           ICON="icon.png"
 
-          if [ ! -f "$ICON" ]; then
-            echo "ERROR: icon.png not found!"
-            exit 1
-          fi
-
-          # Remove old launcher resources
           rm -rf android/app/src/main/res/mipmap-ldpi
           rm -rf android/app/src/main/res/mipmap-mdpi
           rm -rf android/app/src/main/res/mipmap-hdpi
@@ -165,7 +138,6 @@ jobs:
           rm -rf android/app/src/main/res/mipmap-xxxhdpi
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
 
-          # Create folders
           mkdir -p android/app/src/main/res/mipmap-ldpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-hdpi
@@ -173,7 +145,6 @@ jobs:
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
-          # Android launcher icon sizes
           convert "$ICON" -resize 36x36 \
             android/app/src/main/res/mipmap-ldpi/ic_launcher.png
 
@@ -192,66 +163,18 @@ jobs:
           convert "$ICON" -resize 192x192 \
             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
-          # Round launcher icons
-          cp android/app/src/main/res/mipmap-ldpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-ldpi/ic_launcher_round.png
+          for density in ldpi mdpi hdpi xhdpi xxhdpi xxxhdpi
+          do
+            cp \
+              android/app/src/main/res/mipmap-$density/ic_launcher.png \
+              android/app/src/main/res/mipmap-$density/ic_launcher_round.png
+          done
 
-          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png \
-            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-
-          echo ""
-          echo "========== Generated icons =========="
-
-          find android/app/src/main/res \
-            -type f \
-            \( -name "ic_launcher.png" -o -name "ic_launcher_round.png" \) \
-            | sort
+          echo "Icons generated successfully."
 
 
       # ==========================================
-      # 12. Fix Android Manifest
-      # ==========================================
-      - name: Configure Android launcher
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          manifest = Path(
-              "android/app/src/main/AndroidManifest.xml"
-          )
-
-          text = manifest.read_text()
-
-          text = text.replace(
-              'android:icon="@mipmap/ic_launcher"',
-              'android:icon="@mipmap/ic_launcher"'
-          )
-
-          text = text.replace(
-              'android:roundIcon="@mipmap/ic_launcher_round"',
-              'android:roundIcon="@mipmap/ic_launcher_round"'
-          )
-
-          manifest.write_text(text)
-
-          print(manifest.read_text())
-          PY
-
-
-      # ==========================================
-      # 13. Gradle properties
+      # 11. Configure Gradle
       # ==========================================
       - name: Configure Gradle
         run: |
@@ -265,7 +188,7 @@ jobs:
 
 
       # ==========================================
-      # 14. Fix Kotlin duplicate classes
+      # 12. Fix Kotlin duplicate classes
       # ==========================================
       - name: Fix Kotlin dependencies
         run: |
@@ -284,7 +207,7 @@ jobs:
 
 
       # ==========================================
-      # 15. Sync Capacitor
+      # 13. Sync Capacitor
       # ==========================================
       - name: Sync Capacitor
         run: |
@@ -292,7 +215,51 @@ jobs:
 
 
       # ==========================================
-      # 16. Verify project
+      # 14. Create Release Keystore
+      # ==========================================
+      - name: Create release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/taskpro-release.jks
+
+          echo "Keystore created:"
+          ls -lh android/taskpro-release.jks
+
+
+      # ==========================================
+      # 15. Configure Release Signing
+      # ==========================================
+      - name: Configure release signing
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cat >> android/app/build.gradle <<EOF
+
+          android {
+              signingConfigs {
+                  release {
+                      storeFile file("../taskpro-release.jks")
+                      storePassword "${KEYSTORE_PASSWORD}"
+                      keyAlias "${KEY_ALIAS}"
+                      keyPassword "${KEY_PASSWORD}"
+                  }
+              }
+
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                      minifyEnabled false
+                  }
+              }
+          }
+          EOF
+
+
+      # ==========================================
+      # 16. Verify Gradle project
       # ==========================================
       - name: Verify Android project
         run: |
@@ -300,16 +267,12 @@ jobs:
           ls -lah android
 
           echo ""
-          echo "========== GRADLE =========="
-          ls -lah android/gradle
+          echo "========== APP =========="
+          ls -lah android/app
 
           echo ""
-          echo "========== ICONS =========="
-
-          find android/app/src/main/res \
-            -type f \
-            -name "ic_launcher*" \
-            | sort
+          echo "========== KEYSTORE =========="
+          ls -lh android/taskpro-release.jks
 
 
       # ==========================================
@@ -322,12 +285,12 @@ jobs:
 
 
       # ==========================================
-      # 18. Build APK
+      # 18. Build RELEASE APK
       # ==========================================
-      - name: Build Debug APK
+      - name: Build Release APK
         working-directory: android
         run: |
-          ./gradlew assembleDebug \
+          ./gradlew assembleRelease \
             --no-daemon \
             --stacktrace \
             --no-parallel
@@ -338,20 +301,20 @@ jobs:
       # ==========================================
       - name: Find APK
         run: |
-          echo "========== APK =========="
+          echo "========== RELEASE APK =========="
 
-          find android/app/build/outputs/apk \
+          find android/app/build/outputs/apk/release \
             -type f \
             -name "*.apk" \
             -print
 
 
       # ==========================================
-      # 20. Upload APK
+      # 20. Upload Release APK
       # ==========================================
-      - name: Upload APK
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: TaskPro-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: TaskPro-release-apk
+          path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error

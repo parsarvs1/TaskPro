@@ -173,7 +173,7 @@ select {
     display: grid;
 
     grid-template-columns:
-        repeat(3,1fr);
+        repeat(4,1fr);
 
     gap: 6px;
 
@@ -193,19 +193,33 @@ select {
 
 .nav-btn {
 
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
     border: none;
 
     background: transparent;
 
     color: #777;
 
-    padding: 12px 5px;
+    padding: 12px 4px;
 
     border-radius: 13px;
 
     cursor: pointer;
 
-    font-size: 14px;
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 
     transition: .2s;
 }
@@ -213,7 +227,9 @@ select {
 
 .nav-btn span {
 
-    margin-left: 4px;
+    margin-left: 0;
+
+    flex-shrink: 0;
 }
 
 
@@ -622,6 +638,282 @@ select {
     color: #777;
 
     font-size: 13px;
+}
+
+
+.hidden {
+
+    display: none !important;
+}
+
+
+/* =========================
+   ACCOUNT PAGE
+========================= */
+
+.auth-box {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.05);
+}
+
+
+.auth-tabs {
+
+    display: flex;
+
+    gap: 8px;
+
+    background: #f1f2f7;
+
+    border-radius: 13px;
+
+    padding: 5px;
+
+    margin-bottom: 16px;
+}
+
+
+.auth-tab {
+
+    flex: 1;
+
+    border: none;
+
+    background: transparent;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    color: #666;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+.auth-tab.active {
+
+    background: #5b5bf7;
+
+    color: white;
+}
+
+
+.auth-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.auth-form input {
+
+    border: 1px solid #ddd;
+
+    outline: none;
+
+    border-radius: 11px;
+
+    padding: 12px;
+
+    font-size: 14px;
+
+    font-family: inherit;
+
+    background: #fafafe;
+
+    color: #222;
+}
+
+
+.auth-form input:focus {
+
+    border-color: #5b5bf7;
+}
+
+
+.account-btn {
+
+    background: #5b5bf7;
+
+    color: white;
+
+    margin-top: 4px;
+}
+
+
+.profile-box {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.05);
+}
+
+
+.profile-avatar {
+
+    width: 70px;
+
+    height: 70px;
+
+    border-radius: 50%;
+
+    background: #eef0ff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 32px;
+
+    margin: 0 auto 14px;
+}
+
+
+.profile-box h3 {
+
+    font-size: 19px;
+
+    margin-bottom: 4px;
+}
+
+
+.profile-box p {
+
+    color: #888;
+
+    font-size: 13px;
+
+    margin-bottom: 20px;
+}
+
+
+.secondary-btn,
+.danger-btn {
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 11px 17px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    width: 100%;
+
+    margin-top: 8px;
+
+    transition: .2s;
+}
+
+
+.secondary-btn {
+
+    background: #f1f2f7;
+
+    color: #444;
+}
+
+
+.secondary-btn:hover {
+
+    background: #e5e6ee;
+}
+
+
+.danger-btn {
+
+    background: #ffe5e5;
+
+    color: #d62828;
+}
+
+
+.danger-btn:hover {
+
+    background: #ffd2d2;
+}
+
+
+body.dark .auth-box,
+body.dark .profile-box {
+
+    background: #23243a;
+}
+
+
+body.dark .auth-tabs {
+
+    background: #2e2f47;
+}
+
+
+body.dark .auth-form input {
+
+    background: #292c33;
+
+    color: white;
+
+    border-color: #444;
+}
+
+
+body.dark .secondary-btn {
+
+    background: #2e2f47;
+
+    color: #ddd;
+}
+
+
+body.dark .secondary-btn:hover {
+
+    background: #383a58;
+}
+
+
+body.dark .danger-btn {
+
+    background: #4a1f1f;
+
+    color: #ff9c9c;
+}
+
+
+body.dark .profile-avatar {
+
+    background: #2c2d55;
 }
 
 
@@ -1428,6 +1720,8 @@ select {
 
     font-size: 13px;
 
+    max-width: calc(100% - 40px);
+
     box-shadow:
         0 10px 30px
         rgba(0,0,0,.2);
@@ -1448,8 +1742,42 @@ select {
 
     opacity: 1;
 
+    pointer-events: auto;
+
     transform:
         translate(-50%, 0);
+}
+
+
+.toast-undo {
+
+    border: none;
+
+    background: rgba(255,255,255,.15);
+
+    color: #8ec8ff;
+
+    font-weight: bold;
+
+    font-size: 12px;
+
+    padding: 6px 10px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+
+    white-space: nowrap;
+
+    transition: .2s;
+}
+
+
+.toast-undo:hover {
+
+    background: rgba(255,255,255,.25);
 }
 
 
@@ -1643,9 +1971,11 @@ body.dark .edit-select {
 
     .nav-btn {
 
-        font-size: 12px;
+        font-size: 11px;
 
-        padding: 10px 3px;
+        padding: 10px 2px;
+
+        gap: 3px;
 
     }
 

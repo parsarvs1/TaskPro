@@ -107,6 +107,16 @@
 
         </button>
 
+        <button
+            class="nav-btn"
+            data-page="account"
+            type="button">
+
+            <span>👤</span>
+            حساب
+
+        </button>
+
     </nav>
 
 
@@ -488,6 +498,157 @@
 
     </main>
 
+
+    <!-- =========================
+         ACCOUNT PAGE
+    ========================== -->
+
+    <main
+        id="accountPage"
+        class="page">
+
+        <section class="section-title">
+
+            <h2>
+                حساب کاربری 👤
+            </h2>
+
+            <p>
+                اطلاعاتت فقط روی همین دستگاه ذخیره می‌شه
+            </p>
+
+        </section>
+
+
+        <!-- LOGGED OUT -->
+
+        <div id="authBox" class="auth-box">
+
+            <div class="auth-tabs">
+
+                <button
+                    id="showRegisterBtn"
+                    class="auth-tab active"
+                    type="button">
+
+                    ساخت حساب
+
+                </button>
+
+                <button
+                    id="showLoginBtn"
+                    class="auth-tab"
+                    type="button">
+
+                    ورود
+
+                </button>
+
+            </div>
+
+
+            <!-- REGISTER FORM -->
+
+            <div id="registerForm" class="auth-form">
+
+                <input
+                    type="text"
+                    id="regName"
+                    placeholder="نام شما"
+                    autocomplete="off">
+
+                <input
+                    type="text"
+                    id="regUsername"
+                    placeholder="نام کاربری"
+                    autocomplete="off">
+
+                <input
+                    type="password"
+                    id="regPassword"
+                    placeholder="رمز عبور"
+                    autocomplete="off">
+
+                <button
+                    id="registerBtn"
+                    class="primary-btn account-btn"
+                    type="button">
+
+                    ✨ ساخت حساب
+
+                </button>
+
+            </div>
+
+
+            <!-- LOGIN FORM -->
+
+            <div id="loginForm" class="auth-form hidden">
+
+                <input
+                    type="text"
+                    id="loginUsername"
+                    placeholder="نام کاربری"
+                    autocomplete="off">
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="رمز عبور"
+                    autocomplete="off">
+
+                <button
+                    id="loginBtn"
+                    class="primary-btn account-btn"
+                    type="button">
+
+                    ورود 🔑
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOGGED IN -->
+
+        <div id="profileBox" class="profile-box hidden">
+
+            <div class="profile-avatar">
+                👤
+            </div>
+
+            <h3 id="profileName">
+                ---
+            </h3>
+
+            <p id="profileUsername">
+                @---
+            </p>
+
+            <button
+                id="logoutBtn"
+                class="secondary-btn"
+                type="button">
+
+                خروج از حساب
+
+            </button>
+
+            <button
+                id="deleteAccountBtn"
+                class="danger-btn"
+                type="button">
+
+                حذف حساب
+
+            </button>
+
+        </div>
+
+    </main>
+
 </div>
 
 
@@ -504,6 +665,15 @@
     <span id="toastMessage">
         انجام شد
     </span>
+
+    <button
+        id="toastUndoBtn"
+        class="toast-undo hidden"
+        type="button">
+
+        بازگردانی
+
+    </button>
 
 </div>
 
@@ -553,3 +723,4 @@
 </body>
 
     </html>
+    

@@ -1,6 +1,6 @@
 // ========================================
 // TaskPro
-// Version 1.1.0
+// Version 2.3.0
 // ========================================
 
 
@@ -27,6 +27,29 @@ const tasksPage =
 
 const statsPage =
     document.getElementById("statsPage");
+
+const accountPage =
+    document.getElementById("accountPage");
+
+
+// Page order (used for nav + swipe)
+
+const PAGE_ORDER =
+    ["home", "tasks", "stats", "account"];
+
+const pageElements = {
+
+    home: homePage,
+
+    tasks: tasksPage,
+
+    stats: statsPage,
+
+    account: accountPage
+
+};
+
+let currentPage = "home";
 
 
 // Home
@@ -114,6 +137,9 @@ const toastIcon =
 const toastMessage =
     document.getElementById("toastMessage");
 
+const toastUndoBtn =
+    document.getElementById("toastUndoBtn");
+
 
 // ========================================
 // DATA
@@ -175,7 +201,8 @@ let toastTimer = null;
 
 function showToast(
     message,
-    icon = "✅"
+    icon = "✅",
+    onUndo = null
 ) {
 
     if (!toast) {
@@ -191,12 +218,57 @@ function showToast(
         message;
 
 
+    // Undo button
+    // (assigning .onclick replaces any
+    // previous handler automatically)
+
+    if (toastUndoBtn) {
+
+        if (onUndo) {
+
+            toastUndoBtn.classList.remove(
+                "hidden"
+            );
+
+
+            toastUndoBtn.onclick =
+                () => {
+
+                    clearTimeout(
+                        toastTimer
+                    );
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                    onUndo();
+
+                };
+
+        } else {
+
+            toastUndoBtn.classList.add(
+                "hidden"
+            );
+
+            toastUndoBtn.onclick = null;
+
+        }
+
+    }
+
+
     toast.classList.add("show");
 
 
     clearTimeout(
         toastTimer
     );
+
+
+    const duration =
+        onUndo ? 4500 : 2200;
 
 
     toastTimer =
@@ -208,7 +280,7 @@ function showToast(
                 );
 
             },
-            2200
+            duration
         );
 
 }
@@ -290,48 +362,29 @@ if (darkModeBtn) {
 
 function showPage(pageName) {
 
-    // Hide pages
+    if (!pageElements[pageName]) {
+        return;
+    }
 
-    homePage.classList.remove(
-        "active-page"
-    );
 
-    tasksPage.classList.remove(
-        "active-page"
-    );
+    // Hide all pages
 
-    statsPage.classList.remove(
-        "active-page"
+    PAGE_ORDER.forEach(
+        name => {
+
+            pageElements[name].classList.remove(
+                "active-page"
+            );
+
+        }
     );
 
 
     // Show selected page
 
-    if (pageName === "home") {
-
-        homePage.classList.add(
-            "active-page"
-        );
-
-    }
-
-
-    if (pageName === "tasks") {
-
-        tasksPage.classList.add(
-            "active-page"
-        );
-
-    }
-
-
-    if (pageName === "stats") {
-
-        statsPage.classList.add(
-            "active-page"
-        );
-
-    }
+    pageElements[pageName].classList.add(
+        "active-page"
+    );
 
 
     // Update navigation
@@ -350,6 +403,9 @@ function showPage(pageName) {
 
         }
     );
+
+
+    currentPage = pageName;
 
 
     updateStats();
@@ -375,6 +431,162 @@ navButtons.forEach(
 
     }
 );
+
+
+// ========================================
+// SWIPE NAVIGATION
+// ========================================
+
+const appContainer =
+    document.querySelector(".app");
+
+let touchStartX = 0;
+
+let touchStartY = 0;
+
+let touchTracking = false;
+
+
+function isSwipeBlockedTarget(target) {
+
+    return !!target.closest(
+
+        "input, select, textarea, .filters, .task-actions, .edit-area"
+
+    );
+
+}
+
+
+if (appContainer) {
+
+    appContainer.addEventListener(
+        "touchstart",
+        event => {
+
+            const touch =
+                event.touches[0];
+
+
+            if (
+                isSwipeBlockedTarget(
+                    event.target
+                )
+            ) {
+
+                touchTracking = false;
+
+                return;
+
+            }
+
+
+            touchTracking = true;
+
+            touchStartX =
+                touch.clientX;
+
+            touchStartY =
+                touch.clientY;
+
+        },
+        { passive: true }
+    );
+
+
+    appContainer.addEventListener(
+        "touchend",
+        event => {
+
+            if (!touchTracking) {
+                return;
+            }
+
+
+            touchTracking = false;
+
+
+            const touch =
+                event.changedTouches[0];
+
+            const deltaX =
+                touch.clientX -
+                touchStartX;
+
+            const deltaY =
+                touch.clientY -
+                touchStartY;
+
+
+            const SWIPE_THRESHOLD = 55;
+
+
+            // Ignore mostly-vertical swipes
+
+            if (
+                Math.abs(deltaX) <
+                SWIPE_THRESHOLD
+            ) {
+
+                return;
+
+            }
+
+            if (
+                Math.abs(deltaX) <
+                Math.abs(deltaY) * 1.5
+            ) {
+
+                return;
+
+            }
+
+
+            const currentIndex =
+                PAGE_ORDER.indexOf(
+                    currentPage
+                );
+
+            let nextIndex =
+                currentIndex;
+
+
+            if (deltaX < 0) {
+
+                // Swiped left -> next page
+
+                nextIndex =
+                    Math.min(
+                        currentIndex + 1,
+                        PAGE_ORDER.length - 1
+                    );
+
+            } else {
+
+                // Swiped right -> previous page
+
+                nextIndex =
+                    Math.max(
+                        currentIndex - 1,
+                        0
+                    );
+
+            }
+
+
+            if (nextIndex !== currentIndex) {
+
+                showPage(
+                    PAGE_ORDER[nextIndex]
+                );
+
+            }
+
+        },
+        { passive: true }
+    );
+
+}
 
 
 // ========================================
@@ -524,6 +736,24 @@ taskInput.addEventListener(
 
 function deleteTask(id) {
 
+    // Keep a snapshot for undo
+
+    const deletedIndex =
+        tasks.findIndex(
+            task =>
+                task.id === id
+        );
+
+
+    if (deletedIndex === -1) {
+        return;
+    }
+
+
+    const deletedTask =
+        tasks[deletedIndex];
+
+
     tasks =
         tasks.filter(
             task =>
@@ -541,7 +771,32 @@ function deleteTask(id) {
 
     showToast(
         "کار حذف شد",
-        "🗑️"
+        "🗑️",
+        () => {
+
+            // Restore task at its
+            // original position
+
+            tasks.splice(
+                deletedIndex,
+                0,
+                deletedTask
+            );
+
+
+            saveTasks();
+
+            renderTasks();
+
+            updateStats();
+
+
+            showToast(
+                "کار بازگردانده شد",
+                "↩️"
+            );
+
+        }
     );
 
 }
@@ -932,6 +1187,13 @@ function clearCompletedTasks() {
     }
 
 
+    // Snapshot for undo
+    // (keeps full original order)
+
+    const previousTasks =
+        [...tasks];
+
+
     // Remove completed
 
     tasks =
@@ -957,7 +1219,26 @@ function clearCompletedTasks() {
 
     showToast(
         `${completedCount} کار انجام‌شده پاک شد`,
-        "🧹"
+        "🧹",
+        () => {
+
+            tasks =
+                previousTasks;
+
+
+            saveTasks();
+
+            renderTasks();
+
+            updateStats();
+
+
+            showToast(
+                "کارها بازگردانده شدند",
+                "↩️"
+            );
+
+        }
     );
 
 }
@@ -1500,6 +1781,498 @@ function updateStats() {
     }
 
 }
+
+
+// ========================================
+// ACCOUNT
+// ========================================
+
+// Elements
+
+const showRegisterBtn =
+    document.getElementById(
+        "showRegisterBtn"
+    );
+
+const showLoginBtn =
+    document.getElementById(
+        "showLoginBtn"
+    );
+
+const registerForm =
+    document.getElementById(
+        "registerForm"
+    );
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const regName =
+    document.getElementById("regName");
+
+const regUsername =
+    document.getElementById(
+        "regUsername"
+    );
+
+const regPassword =
+    document.getElementById(
+        "regPassword"
+    );
+
+const registerBtn =
+    document.getElementById(
+        "registerBtn"
+    );
+
+const loginUsername =
+    document.getElementById(
+        "loginUsername"
+    );
+
+const loginPassword =
+    document.getElementById(
+        "loginPassword"
+    );
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const authBox =
+    document.getElementById("authBox");
+
+const profileBox =
+    document.getElementById(
+        "profileBox"
+    );
+
+const profileName =
+    document.getElementById(
+        "profileName"
+    );
+
+const profileUsername =
+    document.getElementById(
+        "profileUsername"
+    );
+
+const logoutBtn =
+    document.getElementById(
+        "logoutBtn"
+    );
+
+const deleteAccountBtn =
+    document.getElementById(
+        "deleteAccountBtn"
+    );
+
+
+// Very simple local hash
+// (NOT real security — this app has no
+// server, it only keeps people from
+// seeing a plain-text password in
+// localStorage by mistake)
+
+function simpleHash(text) {
+
+    let hash = 0;
+
+
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
+
+        hash =
+            (hash << 5) -
+            hash +
+            text.charCodeAt(i);
+
+        hash |= 0;
+
+    }
+
+
+    return hash.toString(36);
+
+}
+
+
+// Load account from storage
+
+let account = null;
+
+try {
+
+    account =
+        JSON.parse(
+            localStorage.getItem(
+                "taskpro_account"
+            )
+        );
+
+} catch (error) {
+
+    account = null;
+
+}
+
+
+let isLoggedIn =
+    localStorage.getItem(
+        "taskpro_session"
+    ) === "true";
+
+
+function saveAccount() {
+
+    localStorage.setItem(
+        "taskpro_account",
+        JSON.stringify(account)
+    );
+
+}
+
+
+function setSession(loggedIn) {
+
+    isLoggedIn = loggedIn;
+
+    localStorage.setItem(
+        "taskpro_session",
+        loggedIn
+    );
+
+}
+
+
+// Show correct account view
+
+function renderAccountView() {
+
+    if (isLoggedIn && account) {
+
+        authBox.classList.add("hidden");
+
+        profileBox.classList.remove(
+            "hidden"
+        );
+
+
+        profileName.textContent =
+            account.name;
+
+        profileUsername.textContent =
+            "@" + account.username;
+
+        return;
+
+    }
+
+
+    profileBox.classList.add("hidden");
+
+    authBox.classList.remove("hidden");
+
+
+    // If an account already exists,
+    // default to the login tab
+
+    if (account) {
+
+        showLoginBtn.click();
+
+    } else {
+
+        showRegisterBtn.click();
+
+    }
+
+}
+
+
+// Tabs
+
+if (showRegisterBtn && showLoginBtn) {
+
+    showRegisterBtn.addEventListener(
+        "click",
+        () => {
+
+            showRegisterBtn.classList.add(
+                "active"
+            );
+
+            showLoginBtn.classList.remove(
+                "active"
+            );
+
+
+            registerForm.classList.remove(
+                "hidden"
+            );
+
+            loginForm.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+
+    showLoginBtn.addEventListener(
+        "click",
+        () => {
+
+            showLoginBtn.classList.add(
+                "active"
+            );
+
+            showRegisterBtn.classList.remove(
+                "active"
+            );
+
+
+            loginForm.classList.remove(
+                "hidden"
+            );
+
+            registerForm.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+}
+
+
+// Register
+
+if (registerBtn) {
+
+    registerBtn.addEventListener(
+        "click",
+        () => {
+
+            const name =
+                regName.value.trim();
+
+            const username =
+                regUsername.value.trim();
+
+            const password =
+                regPassword.value;
+
+
+            if (
+                !name ||
+                !username ||
+                !password
+            ) {
+
+                showToast(
+                    "همه فیلدها را پر کن!",
+                    "⚠️"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                account &&
+                account.username ===
+                    username
+            ) {
+
+                showToast(
+                    "این نام کاربری قبلاً استفاده شده",
+                    "⚠️"
+                );
+
+                return;
+
+            }
+
+
+            account = {
+
+                name: name,
+
+                username: username,
+
+                passwordHash:
+                    simpleHash(password)
+
+            };
+
+
+            saveAccount();
+
+            setSession(true);
+
+
+            regName.value = "";
+
+            regUsername.value = "";
+
+            regPassword.value = "";
+
+
+            renderAccountView();
+
+
+            showToast(
+                `خوش اومدی ${name} 🎉`,
+                "✅"
+            );
+
+        }
+    );
+
+}
+
+
+// Login
+
+if (loginBtn) {
+
+    loginBtn.addEventListener(
+        "click",
+        () => {
+
+            const username =
+                loginUsername.value.trim();
+
+            const password =
+                loginPassword.value;
+
+
+            if (!account) {
+
+                showToast(
+                    "هنوز حسابی ساخته نشده",
+                    "⚠️"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                account.username !==
+                    username ||
+                account.passwordHash !==
+                    simpleHash(password)
+            ) {
+
+                showToast(
+                    "نام کاربری یا رمز اشتباه است",
+                    "⚠️"
+                );
+
+                return;
+
+            }
+
+
+            setSession(true);
+
+
+            loginUsername.value = "";
+
+            loginPassword.value = "";
+
+
+            renderAccountView();
+
+
+            showToast(
+                `خوش برگشتی ${account.name} 👋`,
+                "✅"
+            );
+
+        }
+    );
+
+}
+
+
+// Logout
+
+if (logoutBtn) {
+
+    logoutBtn.addEventListener(
+        "click",
+        () => {
+
+            setSession(false);
+
+            renderAccountView();
+
+
+            showToast(
+                "از حساب خارج شدی",
+                "👋"
+            );
+
+        }
+    );
+
+}
+
+
+// Delete account
+
+if (deleteAccountBtn) {
+
+    deleteAccountBtn.addEventListener(
+        "click",
+        () => {
+
+            const sure =
+                confirm(
+                    "مطمئنی می‌خوای حساب رو حذف کنی؟"
+                );
+
+
+            if (!sure) {
+                return;
+            }
+
+
+            account = null;
+
+
+            localStorage.removeItem(
+                "taskpro_account"
+            );
+
+
+            setSession(false);
+
+
+            renderAccountView();
+
+
+            showToast(
+                "حساب حذف شد",
+                "🗑️"
+            );
+
+        }
+    );
+
+}
+
+
+renderAccountView();
 
 
 // ========================================
